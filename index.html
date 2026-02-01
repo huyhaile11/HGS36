@@ -3,588 +3,451 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LỊCH CỐNG HIẾN HGS - Xanh nhạt</title>
+  <title>LỊCH CỐNG HIẾN HGS - CLOUD</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  
+  <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
   <style>
-    body { font-family: 'Inter', sans-serif; background: #eef4fb; color: #1f2937; }
-    .card { background: #ffffff; border-radius: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .toast {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: rgba(59,130,246,0.95); color: white; padding: 10px 18px;
-      border-radius: 10px; font-weight: 600; z-index: 9999; animation: fadeInOut 2s forwards;
+    body { 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%); 
+      color: #1e293b; 
+      min-height: 100vh;
     }
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translate(-50%, -55%); }
-      10%, 90% { opacity: 1; transform: translate(-50%, -50%); }
-      100% { opacity: 0; transform: translate(-50%, -45%); }
+    .glass-card { 
+      background: rgba(255, 255, 255, 0.95); 
+      border-radius: 1.25rem; 
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.5);
     }
-    #suggestions { z-index: 50; }
-    table.result-table th, table.result-table td {
-      padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px; text-align:left; vertical-align: middle;
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 1rem;
+      border-left: 4px solid #3b82f6;
+      padding-left: 12px;
     }
-    table.result-table td.center { text-align:center; }
-    .day-container { background: white; border: 1px solid #dbeafe; border-radius: 10px; padding: 10px 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
-    .day-title { font-weight: 700; font-size: 15px; padding: 4px 0; color: #2563eb; }
-    .day-past { opacity: 0.6; background: #f8fafc; }
-    .day-today { border: 2px solid #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.15); }
-    .btn-main { background: #3b82f6; color: white; border-radius: 8px; padding: 10px 0; font-weight: 600; width: 100%; }
-    .btn-main:hover { background: #2563eb; }
-    .btn-danger { background: #ef4444; color: white; border-radius: 8px; padding: 10px 0; font-weight: 600; width: 100%; }
-    .btn-yellow { background: #facc15; color: #1f2937; border-radius: 8px; padding: 10px 0; font-weight: 600; width: 100%; }
+    .btn-action { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .btn-action:active { transform: scale(0.97); }
     
-    .checkbox-wrapper { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
-    .checkbox-wrapper input { width: 16px; height: 16px; }
+    .toast {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; color: white; padding: 12px 24px;
+      border-radius: 99px; font-weight: 600; z-index: 9999; 
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      animation: slideDownUp 2.5s forwards;
+    }
+    @keyframes slideDownUp {
+      0% { opacity: 0; transform: translate(-50%, -20px); }
+      15%, 85% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, -20px); }
+    }
+    
+    .day-container { 
+      background: #ffffff; border: 1px solid #e2e8f0; 
+      border-radius: 12px; padding: 12px; 
+    }
+    .staff-sub-table { border-collapse: separate; border-spacing: 0 4px; }
+    .staff-sub-table tr { background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .staff-sub-table td { padding: 8px 10px !important; }
+
+    #cloud-status {
+      font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px;
+      display: inline-block; margin-bottom: 8px; text-transform: uppercase;
+    }
+    .status-online { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .status-offline { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
   </style>
 </head>
 
-<body class="p-3">
-  <div class="max-w-lg mx-auto card p-4 space-y-4">
-    <div class="text-center">
-      <h1 class="text-xl font-bold text-blue-600">📅 LỊCH "CỐNG HIẾN" HGS (Quốc Tế)</h1>
-      <p class="text-sm text-gray-600 mt-1">
-        Đây là link tính lịch Quốc Tế, Nội Địa sử dụng <a href="https://huyhaile11.github.io/HGStest/" target="_blank" class="text-red-500 underline font-medium">link này</a>.
-      </p>
-      <p class="text-sm text-gray-500 mt-1">
-        Nhập ca như: S; X; A; HC; 1X; 1-X; X1; X-1; 0.5X-1; H; DH; M...
-      </p>
-    </div>
+<body class="p-4 md:p-8">
+  <div class="max-w-2xl mx-auto space-y-6">
+    
+    <header class="text-center space-y-2">
+      <div id="cloud-status" class="status-offline">Đang kết nối Cloud...</div>
+      <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-blue-700">📅 LỊCH CỐNG HIẾN HGS</h1>
+      <p class="text-sm text-slate-500 font-medium italic">"Dữ liệu trực tuyến - Đồng bộ tức thì"</p>
+    </header>
 
-    <div class="space-y-2">
-      <input id="week-name" type="text" placeholder="Tên tuần (VD: Tuần 44 - Tháng 10)"
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400">
-      <div class="flex gap-2 flex-wrap">
-        <button id="save-week" class="flex-1 btn-main">💾 Lưu tuần</button>
-        <select id="week-select" class="flex-1 border border-gray-300 rounded-lg text-sm px-2 py-2">
-          <option value="">Chọn tuần</option>
-        </select>
-      </div>
-
-      <div class="space-y-2">
+    <div class="glass-card p-5 space-y-4">
+      <div class="section-title">⚙️ Cập nhật dữ liệu (Chỉ dành cho Admin)</div>
+      <div class="space-y-1">
+        <label class="text-xs font-bold text-slate-500 uppercase ml-1">Chọn file Excel lịch mới nhất</label>
         <input type="file" id="excel-upload" accept=".xls,.xlsx"
-               class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2">
-        <p class="text-xs text-gray-500 mt-1">
-          (Để xem lịch và chuyến bay của tất cả mọi người, hãy tải file Excel và upload lên web)
-        </p>
-        <select id="employee-select"
-                class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2">
-          <option value="">-- Chọn nhân viên nhanh --</option>
+               class="w-full border border-slate-200 rounded-xl text-sm px-2 py-1.5 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+      </div>
+      <p class="text-[10px] text-gray-400 italic">* Khi bạn up file ở đây, tất cả mọi người dùng link này sẽ thấy dữ liệu mới ngay lập tức.</p>
+    </div>
+
+    <div class="glass-card p-5 space-y-4">
+      <div class="section-title">📝 Xem lịch cá nhân</div>
+      <div class="space-y-1">
+        <label class="text-xs font-bold text-slate-500 uppercase ml-1">Chọn tên của bạn</label>
+        <select id="employee-select" class="w-full border border-slate-200 rounded-xl text-sm px-4 py-3 bg-blue-50 font-semibold text-blue-800 outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">-- Đang tải danh sách... --</option>
         </select>
+      </div>
+
+      <div id="days-container" class="grid grid-cols-1 gap-3"></div>
+
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <button id="calc-week" class="btn-action bg-blue-600 text-white rounded-xl py-3 font-bold shadow-md hover:bg-blue-700">📅 Tính giờ tuần</button>
+        <button id="clear-week" class="btn-action bg-amber-500 text-white rounded-xl py-3 font-bold shadow-md hover:bg-amber-600">🧹 Xóa trắng</button>
       </div>
     </div>
 
-    <div id="days-container" class="space-y-3"></div>
-
-    <div class="grid grid-cols-1 gap-2">
-      <button id="calc-week" class="btn-main">📅 Tính lịch tuần</button>
-      <button id="clear-week" class="btn-yellow">🧹 Xóa tuần này</button>
-      <button id="clear-all" class="btn-danger">🗑 Xóa tất cả</button>
-    </div>
-
-    <div id="result-container" class="hidden">
-      <div class="overflow-x-auto mt-3 rounded-lg border border-gray-200">
-        <table class="w-full text-sm text-gray-700">
-          <thead class="bg-blue-100">
+    <div id="result-container" class="hidden glass-card p-5 overflow-hidden">
+      <div class="section-title">📊 Bảng tổng hợp giờ công</div>
+      <div class="overflow-x-auto rounded-xl border border-slate-100">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-slate-600">
             <tr>
-              <th class="px-2 py-1 text-left">Thứ</th>
-              <th class="px-2 py-1 text-left">Ca</th>
-              <th class="px-2 py-1 text-center">Giờ vào</th>
-              <th class="px-2 py-1 text-center">Giờ ra</th>
-              <th class="px-2 py-1 text-center">Tổng</th>
+              <th class="px-4 py-3 text-left">Thứ</th>
+              <th class="px-4 py-3 text-left">Ca</th>
+              <th class="px-4 py-3 text-center">Vào</th>
+              <th class="px-4 py-3 text-center">Ra</th>
+              <th class="px-4 py-3 text-center font-bold text-blue-600">Tổng</th>
             </tr>
           </thead>
-          <tbody id="result-body"></tbody>
+          <tbody id="result-body" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
-      <p id="tribute" class="text-center font-bold text-blue-600 mt-2 hidden">
-        💪 BẠN ĐÃ CỐNG HIẾN HẾT MÌNH CẢ TUẦN!
-      </p>
     </div>
 
-    <a href="https://www.facebook.com/huy.hai.333030" target="_blank"
-      class="text-center mt-3 font-semibold text-blue-600 text-sm bg-blue-50 py-2 rounded-lg shadow-sm block no-underline">
-      ✨ Created by Hải 9 ✨
-    </a>
-
-    <div class="border-t pt-4 mt-4">
-      <h2 class="text-lg font-semibold text-blue-600 text-center mb-2">
-        🔍 Tra cứu chuyến bay
-      </h2>
-      <p class="text-xs text-center text-red-500 mb-2 italic">
-        "Link này chỉ có mục đích tham khảo, File cán bộ gửi vẫn luôn là chuẩn nhất"
-      </p>
-      <div class="space-y-3">
-        <div>
-            <label class="text-xs font-bold text-gray-600 block mb-1">Tìm theo tên:</label>
-            <input id="search-name" type="text" placeholder="Nhập tên nhân viên (VD: HẢI 9)"
-                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:ring-2 focus:ring-blue-400"
-                   autocomplete="off">
-            <div id="suggestions"
-                 class="bg-white border border-gray-200 rounded-lg shadow hidden max-h-40 overflow-y-auto"></div>
+    <div class="glass-card p-5 space-y-4 border-t-4 border-t-indigo-500">
+      <div class="section-title">🔍 Tra cứu chuyến bay & Đồng đội</div>
+      <div class="grid grid-cols-1 gap-4">
+        <div class="relative">
+          <input id="search-name" type="text" placeholder="Tìm tên nhân viên..."
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 pl-10 text-sm focus:ring-2 focus:ring-indigo-400 outline-none shadow-sm" autocomplete="off">
+          <span class="absolute left-3 top-3.5 opacity-40">👤</span>
+          <div id="suggestions" class="absolute w-full bg-white border border-slate-200 rounded-xl shadow-xl mt-1 hidden z-50 max-h-60 overflow-y-auto"></div>
         </div>
-
-        <div>
-            <label class="text-xs font-bold text-gray-600 block mb-1">Hoặc chọn theo chuyến bay:</label>
-            <select id="flight-select-dropdown" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-blue-50 focus:ring-2 focus:ring-blue-400">
-                <option value="">-- Chọn chuyến bay --</option>
-            </select>
-        </div>
-
-        <div id="flight-result" class="mt-3 text-sm"></div>
+        <select id="flight-select-dropdown" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-indigo-50 font-medium text-indigo-900 outline-none focus:ring-2 focus:ring-indigo-400">
+          <option value="">-- Hoặc chọn theo chuyến bay --</option>
+        </select>
+      </div>
+      <div id="flight-result" class="space-y-4">
+          <div id="name-result-info" class="space-y-3"></div>
+          <div id="flight-detail-info"></div>
       </div>
     </div>
 
-    <div class="border-t-2 border-blue-100 pt-5 mt-6 bg-white rounded-xl p-3 shadow-sm">
-      <h2 class="text-lg font-bold text-green-600 text-center mb-1">
-        🤝 LÀM HỘ
-      </h2>
-      <p class="text-xs text-center text-gray-500 mb-3">
-        Tìm người rảnh (không vướng ca) trong khoảng giờ bạn chọn
-      </p>
-      
-      <div class="space-y-3">
-        <div class="flex gap-2 items-center">
-            <span class="text-xs font-bold text-gray-700 w-16">Bắt đầu:</span>
-            <select id="help-start-day" class="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-50">
-                <option value="mon">Thứ Hai</option>
-                <option value="tue">Thứ Ba</option>
-                <option value="wed">Thứ Tư</option>
-                <option value="thu">Thứ Năm</option>
-                <option value="fri">Thứ Sáu</option>
-                <option value="sat">Thứ Bảy</option>
-                <option value="sun">Chủ Nhật</option>
-            </select>
-            <input id="help-start-time" type="number" step="0.5" placeholder="Giờ (VD: 22)" 
-                   class="w-24 border border-gray-300 rounded px-2 py-1.5 text-sm">
+    <div class="glass-card p-5 space-y-4 border-t-4 border-t-emerald-500 bg-emerald-50/30">
+      <div class="section-title text-emerald-700">🤝 Tìm người làm hộ</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-2 p-3 bg-white rounded-xl border border-emerald-100">
+          <p class="text-[10px] font-bold text-emerald-600 uppercase">Bắt đầu</p>
+          <div class="flex gap-2">
+            <select id="help-start-day" class="flex-1 bg-transparent text-sm font-semibold outline-none"></select>
+            <input id="help-start-time" type="number" step="0.5" placeholder="0.0" class="w-16 text-center border-b border-emerald-200 font-bold text-emerald-700">
+          </div>
         </div>
-
-        <div class="flex gap-2 items-center">
-            <span class="text-xs font-bold text-gray-700 w-16">Kết thúc:</span>
-            <select id="help-end-day" class="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm bg-gray-50">
-                <option value="mon">Thứ Hai</option>
-                <option value="tue">Thứ Ba</option>
-                <option value="wed">Thứ Tư</option>
-                <option value="thu">Thứ Năm</option>
-                <option value="fri">Thứ Sáu</option>
-                <option value="sat">Thứ Bảy</option>
-                <option value="sun">Chủ Nhật</option>
-            </select>
-            <input id="help-end-time" type="number" step="0.5" placeholder="Giờ (VD: 6)" 
-                   class="w-24 border border-gray-300 rounded px-2 py-1.5 text-sm">
-        </div>
-
-        <div class="pt-2 space-y-3">
-            <button id="btn-find-all" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-lg shadow border border-purple-800">
-                🔍 Tìm Tất Cả (Toàn bộ NV)
-            </button>
-            <div class="relative flex py-1 items-center">
-                <div class="flex-grow border-t border-gray-300"></div>
-                <span class="flex-shrink-0 mx-4 text-gray-400 text-xs">Hoặc tìm theo nhóm K36</span>
-                <div class="flex-grow border-t border-gray-300"></div>
-            </div>
-            <div class="flex justify-center gap-6 py-1">
-                <label class="checkbox-wrapper">
-                    <input type="checkbox" id="chk-7c" checked>
-                    <span class="text-sm font-medium">Team 7C</span>
-                </label>
-                <label class="checkbox-wrapper">
-                    <input type="checkbox" id="chk-pr" checked>
-                    <span class="text-sm font-medium">Team PR</span>
-                </label>
-            </div>
-            <button id="btn-find-k36" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-lg shadow">
-                🔍 Tìm K36 (Team 7C/PR)
-            </button>
-        </div>
-        <div id="help-result" class="hidden mt-3 bg-green-50 p-3 rounded-lg border border-green-200">
-            <p class="font-bold text-green-700 text-sm mb-2 border-b border-green-200 pb-1">KẾT QUẢ:</p>
-            <ul id="help-list" class="list-disc list-inside text-sm text-gray-700 space-y-1"></ul>
+        <div class="space-y-2 p-3 bg-white rounded-xl border border-emerald-100">
+          <p class="text-[10px] font-bold text-emerald-600 uppercase">Kết thúc</p>
+          <div class="flex gap-2">
+            <select id="help-end-day" class="flex-1 bg-transparent text-sm font-semibold outline-none"></select>
+            <input id="help-end-time" type="number" step="0.5" placeholder="0.0" class="w-16 text-center border-b border-emerald-200 font-bold text-emerald-700">
+          </div>
         </div>
       </div>
+      <div class="flex flex-col gap-2">
+        <button id="btn-find-all" class="btn-action bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-md">🔍 Tìm tất cả người rảnh</button>
+        <div class="flex justify-center gap-4 py-2 bg-white rounded-xl border border-emerald-100">
+            <label class="flex items-center gap-2 cursor-pointer text-sm font-bold text-slate-600"><input type="checkbox" id="chk-7c" checked class="w-4 h-4 rounded text-emerald-600"> Team 7C</label>
+            <label class="flex items-center gap-2 cursor-pointer text-sm font-bold text-slate-600"><input type="checkbox" id="chk-pr" checked class="w-4 h-4 rounded text-emerald-600"> Team PR</label>
+        </div>
+        <button id="btn-find-k36" class="btn-action bg-white border-2 border-emerald-600 text-emerald-600 font-bold py-2.5 rounded-xl hover:bg-emerald-50">👥 Tìm riêng K36</button>
+      </div>
+      <div id="help-result" class="hidden p-4 bg-white rounded-xl border-2 border-emerald-200">
+          <p class="text-xs font-bold text-emerald-600 mb-2 underline">Danh sách đồng nghiệp rảnh:</p>
+          <ul id="help-list" class="grid grid-cols-2 gap-2 text-sm font-medium text-slate-700"></ul>
+      </div>
     </div>
+
+    <footer class="text-center py-6">
+      <a href="https://www.facebook.com/huy.hai.333030" target="_blank"
+         class="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-blue-600 font-bold text-sm rounded-full shadow-sm hover:shadow-md transition-all">
+        ✨ Created by Hải 9 ✨
+      </a>
+    </footer>
   </div>
 
-  <div id="toast"></div>
-
 <script>
-/* ================= JAVASCRIPT CHÍNH ================= */
+// --- CẤU HÌNH FIREBASE ---
+const firebaseConfig = {
+  apiKey: "AIzaSyA2scrs8GpNAWZ5ETId6z3vkUMmArD1yn8",
+  authDomain: "hgs36-6db0b.firebaseapp.com",
+  databaseURL: "https://hgs36-6db0b-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "hgs36-6db0b",
+  storageBucket: "hgs36-6db0b.firebasestorage.app",
+  messagingSenderId: "356125658008",
+  appId: "1:356125658008:web:aec521395459b2192579ed",
+  measurementId: "G-JZVNL3EWSQ"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 const c = id => document.getElementById(id);
 const days = ["Thứ Hai","Thứ Ba","Thứ Tư","Thứ Năm","Thứ Sáu","Thứ Bảy","Chủ Nhật"];
 const daysOrder = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
-const EXCEL_STORAGE_KEY = 'hgs_last_excel_data_v3';
-const SEARCH_STORAGE_KEY = 'hgs_last_search_name_v3';
+const priority = ["HẢI 9", "KHẢI 2", "THU 9", "LY 5", "HẰNG 14", "LẬP 2", "HUY 12", "DŨNG 12", "HUYỀN 15", "KHÁNH 2", "SƠN 12", "NGHĨA 1", "TRÂM 3", "ANH 10", "HOÀNG 10", "HUY 11", "LY 2", "HUY 14"];
+const team7c = ["HẢI 9", "HUY 14", "DŨNG 12", "KHẢI 2", "HUY 12", "HẰNG 14", "HUYỀN 15", "LY 5", "THU 9", "LẬP 2"];
+const teamPR = ["NGHĨA 1", "TRÂM 3", "HOÀNG 10", "HUY 11", "THÚY 7", "ANH 10", "TUẤN 11", "LY 2", "SƠN 12", "KHÁNH 2"];
+const dayMap = {mon:0, tue:1, wed:2, thu:3, fri:4, sat:5, sun:6};
 
 let employeeData = [];
 let flightData = [];
 
 const showToast = msg => {
-  const t = document.createElement('div');
-  t.className='toast';
-  t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),2000);
+  const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
 };
 
-function removeDiacritics(str){
-  if(!str) return "";
-  const s = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return s.replace(/đ/g,'d').replace(/Đ/g,'D');
-}
-function normalizeText(s){
-  if(!s) return "";
-  return removeDiacritics(s).replace(/[–—]/g,'-').replace(/\u00A0/g,' ').replace(/[^A-Z0-9\s\-]/gi,'').trim().replace(/\s+/g,' ').toUpperCase();
-}
+// --- ĐỒNG BỘ CLOUD ---
+db.ref("hgs_data").on("value", (snap) => {
+    const data = snap.val();
+    if(data){
+        employeeData = data.employees || [];
+        flightData = data.flights || [];
+        c("cloud-status").textContent = "Dữ liệu: Trực tuyến";
+        c("cloud-status").className = "status-online";
+        updateUI();
+    } else {
+        c("cloud-status").textContent = "Dữ liệu: Trống";
+        c("employee-select").innerHTML = '<option value="">-- Vui lòng up file Excel --</option>';
+    }
+});
 
-function createInputs(){
-  const box = c("days-container"); box.innerHTML = "";
-  days.forEach((d,i)=>{
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = `<label class="block text-sm font-semibold text-gray-700 mb-1">${d}</label>
-      <input id="day${i}" type="text" placeholder="VD: S; X; A; HC; 1X" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">`;
-    box.appendChild(wrapper);
-  });
-}
-
-const keyWeek = n => "week_"+n;
-const loadWeeksList = ()=>JSON.parse(localStorage.getItem("weeks_list")||"[]");
-const saveWeeksList = arr=>localStorage.setItem("weeks_list", JSON.stringify(arr));
-
-function saveWeek(){
-  const n = c("week-name").value.trim(); if(!n){ showToast("Nhập tên tuần"); return; }
-  const data = {}; days.forEach((_,i)=> data["day"+i]=c("day"+i).value.trim());
-  localStorage.setItem(keyWeek(n), JSON.stringify(data));
-  let list = loadWeeksList(); if(!list.includes(n)){ list.push(n); saveWeeksList(list); fillWeekSelect(); }
-  showToast("Đã lưu tuần "+n);
-}
-function fillWeekSelect(){
-  const s = c("week-select"); if(!s) return;
-  const list = loadWeeksList(); s.innerHTML='<option value="">Chọn tuần</option>';
-  list.forEach(n=>{ const o=document.createElement('option'); o.value=n; o.textContent=n; s.appendChild(o); });
-}
-function loadWeek(n){
-  const raw = localStorage.getItem(keyWeek(n)); if(!raw){ showToast("Tuần trống"); return; }
-  const d = JSON.parse(raw); days.forEach((_,i)=> c("day"+i).value = d["day"+i]||"");
-  showToast("Đã tải "+n);
-}
-function deleteWeek(){
-  const n=c("week-name").value.trim(); if(!n) return showToast("Nhập tên tuần");
-  localStorage.removeItem(keyWeek(n));
-  let list = loadWeeksList().filter(x=>x!==n); saveWeeksList(list); fillWeekSelect();
-  days.forEach((_,i)=> c("day"+i).value=""); showToast("Đã xóa tuần "+n);
-}
-function clearAll(){
-  if(!confirm("Xóa tất cả tuần?")) return;
-  loadWeeksList().forEach(n=>localStorage.removeItem(keyWeek(n)));
-  saveWeeksList([]); fillWeekSelect(); days.forEach((_,i)=> c("day"+i).value="");
-  showToast("Đã xóa tất cả");
-}
-
-/* ---------- TÍNH CA ---------- */
-const shifts={ HC:{start:7.5,end:15.5},A:{start:22,end:30},X:{start:14,end:22},S:{start:6,end:14} };
-function parseShift(str){
-  str=(str||"").toUpperCase().trim(); if(!str) return null;
-  if(str==="OM"||str==="OFF") return {start:0,end:0,dur:0}; 
-  const re_fixed=/^(\d*\.?\d*-?)?(H|DH|M)(\d*\.?\d*)?(-?\d*\.?\d*)?$/; 
-  const m_fixed=re_fixed.exec(str);
-  if(m_fixed){
-      const [,pre,code,val,suf]=m_fixed;
-      let duration=8, start=8; 
-      if(code==="DH"||code==="M") duration=parseFloat(val)||0;
-      else if (code==="H"){ if(val) duration=parseFloat(val); if(/H4S/.test(str)) {start=8; duration=4;} else if(/H4C/.test(str)) {start=14; duration=4;} }
-      if(duration<=0) return {start:0,end:0,dur:0};
-      let end=start+duration;
-      if(pre){ const v=parseFloat(pre.replace("-","")); pre.includes("-")?start+=v:start-=v; }
-      if(suf){ const v=parseFloat(suf.replace("-","")); suf.startsWith("-")?end-=v:end+=v; }
-      if(start>=end) end+=24;
-      return {start,end,dur:end-start};
-  }
-  const re=/^(\d*\.?\d*-?)?([A-Z]{1,2})(-?\d*\.?\d*)?$/;
-  const m=re.exec(str); if(!m) return {error:"Sai định dạng"};
-  const [,pre,code,suf]=m; if(!shifts[code]) return {error:"Ca không tồn tại"};
-  let {start,end}=shifts[code];
-  if(pre){ const val=parseFloat(pre.replace("-","")); pre.includes("-")?start+=val:start-=val; }
-  if(suf){ const val=parseFloat(suf.replace("-","")); suf.startsWith("-")?end-=val:end+=val; }
-  if(start>=end) end+=24;
-  return {start,end,dur:end-start};
-}
-function fmtHoursToHHMM(t){
-  const hh=Math.floor(t%24); const mm=Math.round((t%1)*60);
-  return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
-}
-function calcWeek(){
-  const tbody=c("result-body"); if(!tbody) return;
-  tbody.innerHTML=""; let total=0,full=true;
-  days.forEach((d,i)=>{
-    const v=c("day"+i).value.trim();
-    if(!v){ tbody.innerHTML+=`<tr><td>${d}</td><td colspan=4 class="italic text-gray-400">Nghỉ</td></tr>`; full=false; return; }
-    let sum=0; const parts=v.split(";").map(x=>x.trim()).filter(Boolean);
-    parts.forEach((p,j)=>{
-      const r=parseShift(p);
-      if(r&&r.error){tbody.innerHTML+=`<tr><td>${j?"":d}</td><td>${p}</td><td colspan=3 class="text-red-600">${r.error}</td></tr>`;return;}
-      if(r){
-          if(r.dur===0 && (p==="OM"||p==="OFF")){ tbody.innerHTML+=`<tr><td>${j?"":d}</td><td>${p}</td><td colspan=3 class="italic text-gray-400">${p==="OM"?"Nghỉ ốm":"Nghỉ OFF"}</td></tr>`; }
-          else if(r.dur>0){ tbody.innerHTML+=`<tr><td>${j?"":d}</td><td>${p}</td><td>${fmtHoursToHHMM(r.start)}</td><td>${fmtHoursToHHMM(r.end)}</td><td>${r.dur.toFixed(1)}h</td></tr>`; sum+=r.dur; }
-      }
+function updateUI(){
+    // Cập nhật select nhân viên
+    const sel = c("employee-select");
+    sel.innerHTML = '<option value="">-- Chọn nhân viên nhanh --</option>';
+    employeeData.sort((a, b) => {
+        const idxA = priority.indexOf(a.name.toUpperCase());
+        const idxB = priority.indexOf(b.name.toUpperCase());
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return a.name.localeCompare(b.name, "vi");
+    }).forEach(e => { sel.innerHTML += `<option value="${e.name}">${e.name}</option>`; });
+    
+    // Cập nhật select chuyến bay
+    const fSel = c("flight-select-dropdown");
+    fSel.innerHTML = '<option value="">-- Chọn chuyến bay --</option>';
+    const unique = [];
+    flightData.forEach(f => {
+        const key = `${f.sheet} | ${f.flt} | ${f.etd}`;
+        if(!unique.find(x => x.key === key)) unique.push({key, sheet: f.sheet, etd: f.etd});
     });
-    if(parts.length>1) tbody.innerHTML+=`<tr class="bg-blue-50 font-medium"><td></td><td colspan=3>Tổng ngày</td><td>${sum.toFixed(1)}h</td></tr>`;
-    total+=sum;
-  });
-  tbody.innerHTML+=`<tr class="bg-blue-100 font-bold"><td colspan=4>Tổng tuần</td><td>${total.toFixed(1)}h</td></tr>`;
-  c("result-container").classList.remove("hidden"); c("tribute").classList.toggle("hidden",!full);
+    unique.sort((a,b) => (daysOrder.indexOf(a.sheet) - daysOrder.indexOf(b.sheet)) || a.etd.localeCompare(b.etd));
+    unique.forEach(u => fSel.innerHTML += `<option value="${u.key}">${u.key}</option>`);
 }
 
-/* ---------- EXCEL PARSE ---------- */
-function combine(a,b){
-  const v1=(a||"").toString().trim(); const v2=(b||"").toString().trim();
-  let combined=[v1,v2].filter(Boolean).join(";");
-  if(!combined||combined.toUpperCase().includes("OFF")) combined="";
-  return combined;
-}
-function parseSheet(sheet,name){
-  const rows=XLSX.utils.sheet_to_json(sheet,{header:1}); if(rows.length<2) return [];
-  return rows.slice(1).map(row=>({
-    name:(row[1]||"").toString().trim(),
-    mon:combine(row[2],row[4]), tue:combine(row[5],row[7]), wed:combine(row[8],row[10]),
-    thu:combine(row[11],row[13]), fri:combine(row[14],row[16]), sat:combine(row[17],row[19]), sun:combine(row[20],row[22]),
-    source:name
-  })).filter(e=>e.name);
-}
-function excelTimeToHHMM(v){
-  if(v===undefined||v===null) return "";
-  if(typeof v==='string') return v.trim();
-  if(typeof v==='number'){ const frac=v-Math.floor(v); const totalMinutes=Math.round(frac*24*60); const H=Math.floor(totalMinutes/60); const M=totalMinutes%60; return String(H).padStart(2,'0')+':'+String(M).padStart(2,'0'); }
-  return String(v);
-}
+// --- XỬ LÝ EXCEL VÀ UP LÊN CLOUD ---
+c("excel-upload").onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = evt => {
+    const data = new Uint8Array(evt.target.result);
+    processAndUpload(data);
+  };
+  r.readAsArrayBuffer(f);
+};
 
-function parseFlightSheet(sheet,sheetName){
-  const out=[]; const startRow=4,endRow=46;
-  const fltCol='M', etdCol='N', gateCol='Q'; const startCol=XLSX.utils.decode_col('P'), endCol=XLSX.utils.decode_col('AF');
-  let lastFlt="",lastEtd="",lastGate="";
-  const namePattern = /([\p{L}Đđ\s\-]+?)\s+(\d{1,4})/ug;
-  for(let r=startRow;r<=endRow;r++){
-    const fltCell=sheet[fltCol+r], etdCell=sheet[etdCol+r], gateCell=sheet[gateCol+r];
-    const fltValRaw=fltCell?(fltCell.v||'').toString().trim():'', etdValRaw=etdCell?etdCell.v:'', gateValRaw=gateCell?(gateCell.v||'').toString().trim():'';
-    const fltVal=fltValRaw||lastFlt, etdVal=etdValRaw!==undefined&&etdValRaw!==""?excelTimeToHHMM(etdValRaw):lastEtd, gateVal=gateValRaw||lastGate;
-    if(fltVal){lastFlt=fltVal;lastEtd=etdVal;lastGate=gateVal;} if(!fltVal) continue;
-    for(let c=startCol;c<=endCol;c++){
-      const colLetter=XLSX.utils.encode_col(c); const cell=sheet[colLetter+r]; if(!cell||!cell.v) continue;
-      let raw=String(cell.v).trim(); if(!raw) continue;
-      const taskGroups = raw.split(/[;\n]+/).map(x=>x.trim()).filter(Boolean);
-      const isSup=colLetter==='P',isGate=colLetter==='Q',isKetso=colLetter==='R',isWlct=colLetter==='S';
-      taskGroups.forEach(groupStr => {
-        const upperGroup = groupStr.toUpperCase(); let tag = "";
-        const hasBD = /\b(BRD|BD)\b/.test(upperGroup); const hasKO = /\b(KO|K)\s*(BRD|BD)\b/.test(upperGroup);
-        if (hasKO) tag = "NO"; else if (hasBD) tag = "BRD";
-        const matches = [...groupStr.matchAll(namePattern)];
-        matches.forEach(m => {
-          const nameOnly = `${m[1].trim()} ${m[2].trim()}`.toUpperCase();
-          out.push({
-            sheet:sheetName, flt:fltVal, etd:etdVal, gate:gateVal, nameOnly:nameOnly, nameNormalized:normalizeText(nameOnly),
-            tag:tag, supFlag:isSup, gateFlag:isGate, ketsoFlag:isKetso, wlctFlag:isWlct
-          });
+function processAndUpload(data){
+  const wb = XLSX.read(data, {type:"array"});
+  let allEmp = [];
+  ["bảng chấm công qt","bảng chấm công nđ"].forEach(t => {
+    const sn = wb.SheetNames.find(n => n.trim().toLowerCase() === t);
+    if(sn){
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1});
+      rows.slice(1).forEach(row => {
+        if(row[1]) allEmp.push({
+            name: String(row[1]).trim(),
+            mon: (row[2]||"")+(row[4]?';'+row[4]:""), tue: (row[5]||"")+(row[7]?';'+row[7]:""),
+            wed: (row[8]||"")+(row[10]?';'+row[10]:""), thu: (row[11]||"")+(row[13]?';'+row[13]:""),
+            fri: (row[14]||"")+(row[16]?';'+row[16]:""), sat: (row[17]||"")+(row[19]?';'+row[19]:""),
+            sun: (row[20]||"")+(row[22]?';'+row[22]:"")
         });
       });
     }
-  }
-  return out;
-}
-
-function processExcelData(data){
-  const wb=XLSX.read(data,{type:"array"});
-  const target=["bảng chấm công qt","bảng chấm công nđ"];
-  let allEmp=[];
-  target.forEach(t=>{ const sn=wb.SheetNames.find(n=>n.trim().toLowerCase()===t); if(sn){allEmp=allEmp.concat(parseSheet(wb.Sheets[sn],sn));} });
-  employeeData=allEmp;
-  const sel=c("employee-select"); sel.innerHTML='<option value="">-- Chọn nhân viên nhanh --</option>';
-  employeeData.sort((a,b)=>a.name.localeCompare(b.name,"vi")).forEach(e=>{
-    const o=document.createElement('option'); o.value=e.name; o.textContent=e.name; sel.appendChild(o);
   });
-  flightData=[];
-  daysOrder.forEach(d=>{ const sn=wb.SheetNames.find(n=>n.trim().toUpperCase()===d); if(sn){flightData=flightData.concat(parseFlightSheet(wb.Sheets[sn],d));} });
-  updateFlightSelect();
-  return true;
+
+  let allFlt = [];
+  const namePattern = /([\p{L}Đđ\s\-]+?)\s+(\d{1,4})/ug;
+  daysOrder.forEach(dName => {
+    const sn = wb.SheetNames.find(n => n.trim().toUpperCase() === dName);
+    if(!sn) return;
+    const sheet = wb.Sheets[sn];
+    let lastFlt="", lastEtd="", lastGate="";
+    for(let r=4; r<=46; r++){
+      const fVal=sheet['M'+r]?sheet['M'+r].v:null, eVal=sheet['N'+r]?sheet['N'+r].v:null, gVal=sheet['Q'+r]?sheet['Q'+r].v:null;
+      const flt=fVal?String(fVal).trim():lastFlt, etd=eVal!==null?excelTimeToHHMM(eVal):lastEtd, gate=gVal?String(gVal).trim():lastGate;
+      if(!flt) continue; lastFlt=flt; lastEtd=etd; lastGate=gate;
+      for(let colIdx=15; colIdx<=31; colIdx++){
+        const cell = sheet[XLSX.utils.encode_col(colIdx)+r];
+        if(cell && cell.v){
+            const matches = [...String(cell.v).matchAll(namePattern)];
+            matches.forEach(m => {
+                const nFull = m[1].trim()+' '+m[2].trim();
+                allFlt.push({
+                    sheet: dName, flt, etd, gate, nameOnly: nFull.toUpperCase(),
+                    nameNormalized: normalizeText(nFull),
+                    task: (colIdx===15?'SUP':colIdx===16?'GATE':colIdx===17?'K.SỔ':colIdx===18?'WLC':'')
+                });
+            });
+        }
+      }
+    }
+  });
+
+  db.ref("hgs_data").set({ employees: allEmp, flights: allFlt }).then(() => {
+      showToast("🚀 Đã đồng bộ Cloud thành công!");
+      c("excel-upload").value = "";
+  });
 }
 
-/* --- DROPDOWN CHUYẾN BAY --- */
-function updateFlightSelect(){
-    const sel = c("flight-select-dropdown");
-    sel.innerHTML = '<option value="">-- Chọn chuyến bay --</option>';
-    const uniqueFlights = new Map();
-    flightData.forEach(f => {
-        const key = `${f.sheet} | ${f.flt} | ${f.etd}`;
-        if(!uniqueFlights.has(key)) uniqueFlights.set(key, f);
+// --- LOGIC GIAO DIỆN (GIỮ NGUYÊN TỪ INDEX3.HTML) ---
+function removeDiacritics(str){ if(!str) return ""; return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g,'d').replace(/Đ/g,'D'); }
+function normalizeText(s){ if(!s) return ""; return removeDiacritics(s).replace(/[^A-Z0-9\s\-]/gi,'').trim().replace(/\s+/g,' ').toUpperCase(); }
+function excelTimeToHHMM(v){ if(typeof v==='number'){ const total=Math.round(v*24*60); return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0'); } return String(v||"").trim(); }
+function timeToMinutes(t){ if(!t || !t.includes(':')) return 9999; const [h,m]=t.split(':').map(Number); return h*60+m; }
+
+const shifts={ HC:{start:7.5,end:15.5},A:{start:22,end:30},X:{start:14,end:22},S:{start:6,end:14} };
+function parseShift(str){
+    str=(str||"").toUpperCase().trim(); if(!str || str==="OFF" || str==="OM") return {start:0,end:0,dur:0};
+    const re_fixed=/^(\d*\.?\d*-?)?(H|DH|M)(\d*\.?\d*)?(-?\d*\.?\d*)?$/;
+    const m_f = re_fixed.exec(str);
+    if(m_f){
+        let duration=8, start=8; if(m_f[2]==="DH"||m_f[2]==="M") duration=parseFloat(m_f[3])||0;
+        else if(m_f[2]==="H"){ if(m_f[3]) duration=parseFloat(m_f[3]); if(/H4S/.test(str)) {start=8;duration=4;} else if(/H4C/.test(str)){start=14;duration=4;} }
+        let end=start+duration;
+        if(m_f[1]){ const v=parseFloat(m_f[1].replace("-","")); m_f[1].includes("-")?start+=v:start-=v; }
+        if(m_f[4]){ const v=parseFloat(m_f[4].replace("-","")); m_f[4].startsWith("-")?end-=v:end+=v; }
+        return {start, end, dur: end-start};
+    }
+    const re=/^(\d*\.?\d*-?)?([A-Z]{1,2})(-?\d*\.?\d*)?$/; const m=re.exec(str);
+    if(!m || !shifts[m[2]]) return {start:8, end:16, dur:8};
+    let {start,end}=shifts[m[2]];
+    if(m[1]){ const v=parseFloat(m[1].replace("-","")); m[1].includes("-")?start+=v:start-=v; }
+    if(m[3]){ const v=parseFloat(m[3].replace("-","")); m[3].startsWith("-")?end-=v:end+=v; }
+    return {start, end, dur: end-start};
+}
+function fmtHoursToHHMM(t){ const hh=Math.floor(t%24); const mm=Math.round((t%1)*60); return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0"); }
+
+function createInputs(){
+    const box = c("days-container"); box.innerHTML = "";
+    days.forEach((d,i)=> box.innerHTML += `<div class="day-container"><label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1">${d}</label><input id="day${i}" type="text" placeholder="Nhập ca..." class="w-full bg-transparent text-sm font-bold text-slate-700 outline-none"></div>`);
+    const hsd = c('help-start-day'), hed = c('help-end-day');
+    const opts = days.map((d,i)=>`<option value="${daysOrder[i].toLowerCase()}">${d}</option>`).join("");
+    hsd.innerHTML = opts; hed.innerHTML = opts;
+}
+
+function getShiftForEmployee(nameNorm, dayKey){
+    const emp = employeeData.find(e => normalizeText(e.name) === nameNorm);
+    if(!emp || !emp[dayKey.toLowerCase()]) return "OFF";
+    const parts = emp[dayKey.toLowerCase()].split(";").map(p=>{ const r = parseShift(p); return (r && r.dur>0) ? `${fmtHoursToHHMM(r.start)}-${fmtHoursToHHMM(r.end)}` : p; });
+    return parts.join(" | ");
+}
+
+function renderFlightResults(nameRaw){
+    const container=c("name-result-info"); const qNorm=normalizeText(nameRaw);
+    const myFlights = flightData.filter(f => f.nameNormalized === qNorm);
+    if(!myFlights.length){ container.innerHTML="<p class='text-slate-400 italic text-center p-4 bg-slate-50 rounded-xl'>Không tìm thấy dữ liệu bay.</p>"; return; }
+    let html = "";
+    daysOrder.forEach(day => {
+        const df = myFlights.filter(f => f.sheet === day).sort((a,b)=>timeToMinutes(a.etd)-timeToMinutes(b.etd));
+        if(!df.length) return;
+        html += `<div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm"><div class="font-bold text-indigo-600 pb-2 mb-3 text-base">📅 ${day}</div>`;
+        df.forEach(mf => {
+            const colleagues = flightData.filter(f => f.sheet===day && f.flt===mf.flt && f.etd===mf.etd);
+            html += `<div class="mb-4 last:mb-0"><div class="flex items-center gap-2 mb-2"><span class="bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold">${mf.flt}</span><span class="font-bold text-slate-700">⏰ ${mf.etd}</span><span class="text-[10px] font-bold text-rose-500 uppercase ml-auto">Gate: ${mf.gate || '?'}</span></div><div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Vị trí: ${mf.task || "ĐIỂM TÊN"}</div><table class="staff-sub-table w-full text-[11px]">`;
+            colleagues.forEach(col => {
+                html += `<tr class="${col.nameNormalized===qNorm?'bg-indigo-50/50':''}"><td>${col.nameOnly}</td><td>${col.task}</td><td class="text-right font-mono font-bold">${getShiftForEmployee(col.nameNormalized, day)}</td></tr>`;
+            });
+            html += `</table></div>`;
+        });
+        html += `</div>`;
     });
-    const sortedKeys = Array.from(uniqueFlights.keys()).sort((a, b) => {
-        const dayA = daysOrder.indexOf(a.split('|')[0].trim());
-        const dayB = daysOrder.indexOf(b.split('|')[0].trim());
-        return dayA !== dayB ? dayA - dayB : a.localeCompare(b);
-    });
-    sortedKeys.forEach(k => {
-        const o = document.createElement('option'); o.value = k; o.textContent = k; sel.appendChild(o);
-    });
+    container.innerHTML = html;
 }
 
 c("flight-select-dropdown").onchange = e => {
     const val = e.target.value; if(!val) return;
     const [sheet, flt, etd] = val.split('|').map(x=>x.trim());
     const matches = flightData.filter(f => f.sheet === sheet && f.flt === flt && f.etd === etd);
-    renderStaffByFlight(matches, sheet, flt, etd);
+    let html = `<div class="p-4 bg-white border-2 border-indigo-200 rounded-xl shadow-lg"><div class="text-center font-bold text-indigo-800 text-sm mb-3 uppercase">Chi tiết ${flt} (${etd})</div><table class="w-full staff-sub-table">`;
+    matches.forEach(m => { html += `<tr><td class="font-bold text-xs">${m.nameOnly}</td><td class="text-indigo-600 font-bold">${m.task}</td><td class="text-right font-mono text-[10px] font-bold">${getShiftForEmployee(m.nameNormalized, sheet)}</td></tr>`; });
+    c("flight-detail-info").innerHTML = html + "</table></div>";
 };
 
-function renderStaffByFlight(matches, sheet, flt, etd){
-    const container = c("flight-result");
-    const dayKey = sheet.toLowerCase();
-    let html = `<div class="day-container day-today">
-        <div class="day-title text-green-600">CHUYẾN: ${flt} (${etd}) - ${sheet}</div>
-        <table class="w-full result-table mt-1">
-            <thead><tr><th>Nhân viên</th><th>Nhiệm vụ</th><th class="text-center">Ca (24h)</th></tr></thead>
-            <tbody>`;
-    
-    // Gộp nhiệm vụ nếu 1 người làm nhiều việc 1 chuyến
-    const grouped = new Map();
-    matches.forEach(m => {
-        if(!grouped.has(m.nameNormalized)) grouped.set(m.nameNormalized, {name: m.nameOnly, tasks: []});
-        const obj = grouped.get(m.nameNormalized);
-        if(m.supFlag) obj.tasks.push("SUP"); if(m.gateFlag) obj.tasks.push("GATE");
-        if(m.ketsoFlag) obj.tasks.push("K.SỔ"); if(m.wlctFlag) obj.tasks.push("WLC");
-        if(m.tag==="BRD") obj.tasks.push("BRD");
+c("search-name").oninput = e => {
+    const q = normalizeText(e.target.value); const box = c("suggestions");
+    if(!q){ box.classList.add("hidden"); return; }
+    const uniqueNames = [...new Set(flightData.map(f=>f.nameOnly))].filter(n=>normalizeText(n).includes(q)).slice(0,10);
+    if(!uniqueNames.length){ box.classList.add("hidden"); return; }
+    box.innerHTML = uniqueNames.map(n=>`<div class="px-4 py-3 hover:bg-indigo-50 cursor-pointer font-bold text-slate-700 text-sm">${n}</div>`).join("");
+    box.classList.remove("hidden");
+    box.querySelectorAll("div").forEach(div=> div.onclick=()=>{ c("search-name").value=div.textContent; box.classList.add("hidden"); renderFlightResults(div.textContent); });
+};
+
+c("employee-select").onchange = e => {
+    const n = e.target.value; if(!n) return;
+    const emp = employeeData.find(x=>x.name===n);
+    daysOrder.forEach((d,i)=> c("day"+i).value = emp[d.toLowerCase()] || "");
+    c("search-name").value = n; renderFlightResults(n);
+};
+
+c("calc-week").onclick = () => {
+    const tbody=c("result-body"); tbody.innerHTML=""; let total=0;
+    days.forEach((d,i)=>{
+        const v=c("day"+i).value.trim(); if(!v){ tbody.innerHTML+=`<tr class="opacity-50"><td>${d}</td><td colspan=4 class='text-slate-400 italic py-2'>Nghỉ</td></tr>`; return; }
+        let sub=0; v.split(";").forEach(p=>{
+            const r=parseShift(p);
+            if(r.dur>0){ tbody.innerHTML+=`<tr class="hover:bg-blue-50/50"><td class="font-bold py-3 px-4">${d}</td><td><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold">${p}</span></td><td class='text-center font-mono'>${fmtHoursToHHMM(r.start)}</td><td class='text-center font-mono'>${fmtHoursToHHMM(r.end)}</td><td class='text-center font-bold text-blue-600'>${r.dur.toFixed(1)}h</td></tr>`; sub+=r.dur; }
+        });
+        total+=sub;
     });
+    tbody.innerHTML+=`<tr class='bg-slate-800 text-white font-bold'><td colspan=4 class="py-3 px-4 rounded-bl-xl uppercase text-xs">Tổng tuần</td><td class='text-center text-lg py-3 rounded-br-xl'>${total.toFixed(1)}h</td></tr>`;
+    c("result-container").classList.remove("hidden");
+    c("result-container").scrollIntoView({ behavior: 'smooth' });
+};
 
-    grouped.forEach((info, normName) => {
-        const emp = employeeData.find(e => normalizeText(e.name) === normName);
-        let shiftDisplay = "Nghỉ/Ko tìm thấy";
-        if(emp && emp[dayKey]){
-            const parts = emp[dayKey].split(";").map(x=>x.trim()).filter(Boolean);
-            const times = parts.map(p => {
-                const r = parseShift(p);
-                return (r && r.dur > 0) ? `${fmtHoursToHHMM(r.start)}-${fmtHoursToHHMM(r.end)}` : p;
-            });
-            shiftDisplay = times.join(" | ");
-        }
-        html += `<tr>
-            <td class="font-bold">${info.name}</td>
-            <td class="text-xs text-blue-600">${[...new Set(info.tasks)].join(", ") || "—"}</td>
-            <td class="text-center font-mono text-xs text-gray-600">${shiftDisplay}</td>
-        </tr>`;
-    });
-
-    html += `</tbody></table></div>`;
-    container.innerHTML = html;
-}
-
-/* --- SEARCH TÊN --- */
-function renderSuggestions(q){
-  const box=c("suggestions"); if(!q||!flightData.length){box.classList.add("hidden");return;}
-  const qNorm=normalizeText(q); const map=new Map();
-  flightData.forEach(d=>{ if(d.nameNormalized && !map.has(d.nameNormalized)) map.set(d.nameNormalized, d.nameOnly); });
-  const matches=[...map.entries()].filter(([norm])=> norm.includes(qNorm)).map(([norm,disp])=>({norm,disp}));
-  if(!matches.length){box.classList.add("hidden");return;}
-  box.innerHTML=matches.map(m=>`<div class="px-3 py-2 hover:bg-blue-50 cursor-pointer" data-n="${m.norm}">${m.disp}</div>`).join("");
-  box.classList.remove("hidden");
-  box.querySelectorAll("div").forEach(div=>{
-    div.onclick=()=>{ c("search-name").value=div.textContent; box.classList.add("hidden"); renderFlightResults(div.textContent); };
-  });
-}
-
-function renderFlightResults(nameRaw){
-  const container=c("flight-result"); if(!flightData.length) return;
-  const qNorm=normalizeText(nameRaw);
-  let matches=flightData.filter(d=> d.nameNormalized === qNorm);
-  if(!matches.length){container.innerHTML=`<p class="text-center text-gray-500 italic">Không tìm thấy dữ liệu.</p>`;return;}
-  const grouped={}; daysOrder.forEach(d=>grouped[d]=[]);
-  matches.forEach(m=>grouped[m.sheet].push(m));
-  let html="";
-  daysOrder.forEach((day)=>{
-    const rows=grouped[day]; if(!rows.length) return;
-    html+=`<div class="day-container mb-2"><div class="day-title">${day}</div><table class="w-full result-table mt-1">
-        <thead><tr><th>FLT</th><th>ETD</th><th>Vị trí</th><th>Boarding</th></tr></thead><tbody>`;
-    rows.forEach(r=>{
-        let pos = [r.supFlag?'SUP':'', r.gateFlag?'GATE':'', r.ketsoFlag?'K.SỔ':'', r.wlctFlag?'WLC':''].filter(Boolean).join(", ");
-        html+=`<tr><td>${r.flt}</td><td>${r.etd}</td><td class="text-xs">${pos}</td><td class="center">${r.tag==="BRD"?"✅":r.tag==="NO"?"❌":""}</td></tr>`;
-    });
-    html+=`</tbody></table></div>`;
-  });
-  container.innerHTML=html;
-}
-
-/* ---------- LÀM HỘ ---------- */
-const team7c = ["HẢI 9", "HUY 14", "DŨNG 12", "KHẢI 2", "HUY 12", "HẰNG 14", "HUYỀN 15", "LY 5", "THU 9", "LẬP 2"];
-const teamPR = ["NGHĨA 1", "TRÂM 3", "HOÀNG 10", "HUY 11", "THÚY 7", "ANH 10", "TUẤN 11", "LY 2", "SƠN 12", "KHÁNH 2"];
-const dayMap = {mon:0, tue:1, wed:2, thu:3, fri:4, sat:5, sun:6};
-const dayKeys = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+c("clear-week").onclick = () => { days.forEach((_,i)=>c("day"+i).value=""); c("result-container").classList.add("hidden"); };
 
 function checkHelp(mode){
-    const startH = parseFloat(c('help-start-time').value), endH = parseFloat(c('help-end-time').value);
-    const startDay = c('help-start-day').value, endDay = c('help-end-day').value;
-    if(isNaN(startH) || isNaN(endH)){ showToast("Nhập giờ đầy đủ!"); return; }
-    const absStart = dayMap[startDay] * 24 + startH, absEnd = dayMap[endDay] * 24 + endH;
-    if(absEnd <= absStart){ showToast("Thời gian kết thúc phải sau bắt đầu!"); return; }
-    let targetList = (mode === 'ALL') ? employeeData : employeeData.filter(e => {
-        const n = normalizeText(e.name);
-        let names = []; if(c('chk-7c').checked) names = [...names, ...team7c]; if(c('chk-pr').checked) names = [...names, ...teamPR];
-        return names.some(tn => normalizeText(tn) === n);
-    });
-    let freeList = [];
-    targetList.forEach(emp => {
-        let isBusy = false, reasons = [];
-        for(let d = dayMap[startDay]; d <= dayMap[endDay]; d++){
-            const shiftStr = emp[dayKeys[d]]; if(!shiftStr || /OFF|OM/.test(shiftStr.toUpperCase())) continue;
-            shiftStr.split(";").forEach(p => {
-                const s = parseShift(p);
-                if(s && s.dur > 0){
-                    const sAbsStart = d * 24 + s.start, sAbsEnd = d * 24 + s.end;
-                    if(Math.max(absStart, sAbsStart) < Math.min(absEnd, sAbsEnd)) isBusy = true;
-                    reasons.push(`${dayKeys[d].toUpperCase()}:${p}`);
-                }
-            });
-            if(isBusy) break;
+    const sH=parseFloat(c('help-start-time').value), eH=parseFloat(c('help-end-time').value);
+    const sD=c('help-start-day').value, eD=c('help-end-day').value;
+    if(isNaN(sH)||isNaN(eH)) return showToast("⚠️ Nhập giờ!");
+    const absS=dayMap[sD]*24+sH, absE=dayMap[eD]*24+eH;
+    let list = (mode==='ALL'?employeeData:employeeData.filter(e=>[...team7c,...teamPR].some(tn=>normalizeText(tn)===normalizeText(e.name))));
+    let free=[];
+    list.forEach(e=>{
+        let busy=false;
+        for(let d=dayMap[sD]; d<=dayMap[eD]; d++){
+            const shifts=(e[daysOrder[d].toLowerCase()]||"").split(";");
+            shifts.forEach(p=>{ const r=parseShift(p); if(r.dur>0){ const rS=d*24+r.start, rE=d*24+r.end; if(Math.max(absS,rS) < Math.min(absE,rE)) busy=true; } });
         }
-        if(!isBusy) freeList.push({name: emp.name, reason: reasons.length ? reasons.join(", ") : "OFF"});
+        if(!busy) free.push(e.name);
     });
-    const resBox = c('help-result'); const resList = c('help-list'); resList.innerHTML = "";
-    if(!freeList.length) resList.innerHTML = "<li>Không có ai rảnh.</li>";
-    else { freeList.sort((a,b)=>a.name.localeCompare(b.name)).forEach(i => {
-        resList.innerHTML += `<li><span class="font-bold">${i.name}</span> <span class="text-xs text-gray-500">(${i.reason})</span></li>`;
-    });}
-    resBox.classList.remove("hidden");
+    c('help-list').innerHTML = free.length ? free.map(n=>`<li class="bg-emerald-50 text-emerald-800 p-2 rounded-lg border border-emerald-100 flex items-center gap-2">🟢 ${n}</li>`).join("") : "<li>Không có ai rảnh</li>";
+    c('help-result').classList.remove("hidden");
 }
 
-/* --- EVENTS --- */
-c("excel-upload").onchange = e => {
-  const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader(); r.onload=evt=>{
-    const data=new Uint8Array(evt.target.result);
-    localStorage.setItem(EXCEL_STORAGE_KEY, btoa(data.reduce((a,i)=>a+String.fromCharCode(i),"")));
-    processExcelData(data); showToast("✅ Đã tải file!");
-  }; r.readAsArrayBuffer(f);
-};
-c("employee-select").onchange = e => {
-  const n=e.target.value; if(!n) return;
-  const emp=employeeData.find(x=>x.name===n);
-  dayKeys.forEach((d,i)=>c("day"+i).value=emp[d]||"");
-  c("search-name").value = n; renderFlightResults(n);
-};
-c("search-name").oninput = e => renderSuggestions(e.target.value);
-c("btn-find-all").onclick = () => checkHelp('ALL');
-c("btn-find-k36").onclick = () => checkHelp('K36');
-c("save-week").onclick=saveWeek;
-c("week-select").onchange=e=>{const v=e.target.value;if(v){c("week-name").value=v;loadWeek(v);} };
-c("calc-week").onclick=calcWeek;
-c("clear-week").onclick=deleteWeek;
-c("clear-all").onclick=clearAll;
+c("btn-find-all").onclick=()=>checkHelp('ALL');
+c("btn-find-k36").onclick=()=>checkHelp('K36');
 
-document.addEventListener("DOMContentLoaded",()=>{
-  createInputs(); fillWeekSelect();
-  const base64=localStorage.getItem(EXCEL_STORAGE_KEY);
-  if(base64){
-    const bin=atob(base64); const arr=new Uint8Array(bin.length);
-    for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
-    processExcelData(arr);
-  }
-});
+document.addEventListener("DOMContentLoaded",()=> createInputs());
 </script>
 </body>
 </html>
