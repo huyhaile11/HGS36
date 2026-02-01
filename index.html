@@ -43,7 +43,11 @@
       100% { opacity: 0; transform: translate(-50%, -20px); }
     }
     
-    .day-container { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; }
+    .day-container { border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; }
+    /* Nền xen kẽ cho phần nhập liệu */
+    .day-even { background: #ffffff; }
+    .day-odd { background: #f8fafc; }
+
     .staff-sub-table td { padding: 6px 8px !important; }
 
     #cloud-status {
@@ -53,7 +57,6 @@
     .status-online { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
     .status-offline { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
-    /* Hiệu ứng chữ Tết */
     .tet-text {
       background: linear-gradient(to bottom, #ef4444, #b91c1c);
       -webkit-background-clip: text;
@@ -100,17 +103,20 @@
       <div class="section-title">📊 Bảng tổng hợp</div>
       <div class="overflow-x-auto rounded-xl border border-slate-100">
         <table class="w-full text-sm">
-          <thead class="bg-slate-50 text-slate-600">
+          <thead class="bg-slate-800 text-white">
             <tr>
               <th class="px-4 py-3 text-left">Thứ</th>
               <th class="px-4 py-3 text-left">Ca</th>
               <th class="px-4 py-3 text-center">Vào</th>
               <th class="px-4 py-3 text-center">Ra</th>
-              <th class="px-4 py-3 text-center font-bold text-blue-600">Tổng</th>
+              <th class="px-4 py-3 text-center font-bold">Tổng</th>
             </tr>
           </thead>
           <tbody id="result-body" class="divide-y divide-slate-100"></tbody>
         </table>
+      </div>
+      <div id="gay-doi-nguoi" class="hidden mt-4 text-center text-red-600 font-bold text-sm animate-pulse italic">
+        ⚠️ Tuần này bạn gãy đôi người, cố lên nhé!
       </div>
     </div>
 
@@ -171,7 +177,6 @@
   </div>
 
 <script>
-// --- GIỮ NGUYÊN CẤU HÌNH FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyA2scrs8GpNAWZ5ETId6z3vkUMmArD1yn8",
   authDomain: "hgs36-6db0b.firebaseapp.com",
@@ -202,7 +207,6 @@ const showToast = msg => {
   document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
 };
 
-// ĐỒNG BỘ CLOUD
 db.ref("hgs_data").on("value", (snap) => {
     const data = snap.val();
     if(data){
@@ -211,9 +215,6 @@ db.ref("hgs_data").on("value", (snap) => {
         c("cloud-status").textContent = "Dữ liệu: Trực tuyến";
         c("cloud-status").className = "status-online";
         updateUI();
-    } else {
-        c("cloud-status").textContent = "Dữ liệu: Trống";
-        c("employee-select").innerHTML = '<option value="">-- Vui lòng up file Excel --</option>';
     }
 });
 
@@ -240,7 +241,6 @@ function updateUI(){
     unique.forEach(u => fSel.innerHTML += `<option value="${u.key}">${u.key}</option>`);
 }
 
-// UP FILE
 c("excel-upload").onchange = e => {
   const f = e.target.files[0]; if(!f) return;
   const r = new FileReader();
@@ -301,7 +301,6 @@ function processAndUpload(data){
   });
 }
 
-// LOGIC XỬ LÝ
 function removeDiacritics(str){ if(!str) return ""; return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g,'d').replace(/Đ/g,'D'); }
 function normalizeText(s){ if(!s) return ""; return removeDiacritics(s).replace(/[^A-Z0-9\s\-]/gi,'').trim().replace(/\s+/g,' ').toUpperCase(); }
 function excelTimeToHHMM(v){ if(typeof v==='number'){ const total=Math.round(v*24*60); return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0'); } return String(v||"").trim(); }
@@ -328,7 +327,10 @@ function fmtHoursToHHMM(t){ const hh=Math.floor(t%24); const mm=Math.round((t%1)
 
 function createInputs(){
     const box = c("days-container"); box.innerHTML = "";
-    days.forEach((d,i)=> box.innerHTML += `<div class="day-container"><label class="block text-[9px] font-extrabold text-slate-400 uppercase mb-0.5">${d}</label><input id="day${i}" type="text" placeholder="Nhập ca..." class="w-full bg-transparent text-sm font-bold text-slate-700 outline-none"></div>`);
+    days.forEach((d,i)=>{
+        const bgClass = i % 2 === 0 ? "day-even" : "day-odd";
+        box.innerHTML += `<div class="day-container ${bgClass}"><label class="block text-[9px] font-extrabold text-slate-400 uppercase mb-0.5">${d}</label><input id="day${i}" type="text" placeholder="Nhập ca..." class="w-full bg-transparent text-sm font-bold text-slate-700 outline-none"></div>`;
+    });
     const opts = days.map((d,i)=>`<option value="${daysOrder[i].toLowerCase()}">${d}</option>`).join("");
     c('help-start-day').innerHTML = opts; c('help-end-day').innerHTML = opts;
 }
@@ -386,18 +388,45 @@ c("employee-select").onchange = e => {
     c("search-name").value = n; renderFlightResults(n);
 };
 
+// --- TÍNH TOÁN BẢNG TỔNG HỢP (CẬP NHẬT) ---
 c("calc-week").onclick = () => {
     const tbody=c("result-body"); tbody.innerHTML=""; let total=0;
+    let gayCount = 0;
+
     days.forEach((d,i)=>{
         const v=c("day"+i).value.trim(); if(!v) return;
-        let sub=0; v.split(";").forEach(p=>{
-            const r=parseShift(p);
-            if(r.dur>0){ tbody.innerHTML+=`<tr><td class="font-bold py-2 px-4">${d}</td><td><span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-bold">${p}</span></td><td class='text-center font-mono text-xs'>${fmtHoursToHHMM(r.start)}</td><td class='text-center font-mono text-xs'>${fmtHoursToHHMM(r.end)}</td><td class='text-center font-bold text-blue-600 text-xs'>${r.dur.toFixed(1)}h</td></tr>`; sub+=r.dur; }
+        const subShifts = v.split(";");
+        let validShifts = [];
+        subShifts.forEach(p => {
+            const r = parseShift(p);
+            if(r.dur > 0) validShifts.push({p, r});
         });
-        total+=sub;
+
+        // Đếm ngày làm ca gãy
+        if(validShifts.length > 1) gayCount++;
+
+        const rowBg = i % 2 === 0 ? "bg-white" : "bg-slate-50";
+
+        validShifts.forEach((item, idx) => {
+            tbody.innerHTML+=`<tr class="${rowBg} hover:bg-blue-50/50">
+                <td class="font-bold py-2 px-4">${idx === 0 ? d : ""}</td>
+                <td><span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-bold">${item.p}</span></td>
+                <td class='text-center font-mono text-xs'>${fmtHoursToHHMM(item.r.start)}</td>
+                <td class='text-center font-mono text-xs'>${fmtHoursToHHMM(item.r.end)}</td>
+                <td class='text-center font-bold text-blue-600 text-xs'>${item.r.dur.toFixed(1)}h</td>
+            </tr>`;
+            total+=item.r.dur;
+        });
     });
-    tbody.innerHTML+=`<tr class='bg-slate-800 text-white font-bold'><td colspan=4 class="py-2 px-4 text-[10px] uppercase">Tổng</td><td class='text-center text-sm py-2'>${total.toFixed(1)}h</td></tr>`;
+    tbody.innerHTML+=`<tr class='bg-slate-800 text-white font-bold'><td colspan=4 class="py-2 px-4 text-[10px] uppercase">Tổng tuần</td><td class='text-center text-sm py-2'>${total.toFixed(1)}h</td></tr>`;
+    
+    // Hiện thông báo nếu gãy 4 lần trở lên
+    const gayWarning = c("gay-doi-nguoi");
+    if(gayCount >= 4) gayWarning.classList.remove("hidden");
+    else gayWarning.classList.add("hidden");
+
     c("result-container").classList.remove("hidden");
+    c("result-container").scrollIntoView({ behavior: 'smooth' });
 };
 
 c("clear-week").onclick = () => { days.forEach((_,i)=>c("day"+i).value=""); c("result-container").classList.add("hidden"); };
