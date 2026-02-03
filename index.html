@@ -13,7 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
   <style>
-    /* Tăng font chữ tổng thể cho mobile */
+    /* Font chữ lớn cho điện thoại */
     html { font-size: 17px; } 
     body { 
       font-family: 'Plus Jakarta Sans', sans-serif; 
@@ -49,7 +49,7 @@
     .day-even { background: #ffffff; }
     .day-odd { background: #f8fafc; }
 
-    .staff-sub-table td { padding: 8px 10px !important; font-size: 0.8rem; }
+    .staff-sub-table td { padding: 8px 10px !important; font-size: 0.85rem; }
 
     #cloud-status {
       font-size: 10px; font-weight: 800; padding: 2px 10px; border-radius: 20px;
@@ -65,25 +65,24 @@
       text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
 
-    /* Hiệu ứng mũi tên xoay */
+    /* Accordion Arrow */
     .arrow-icon { transition: transform 0.3s ease; }
     .details-open .arrow-icon { transform: rotate(180deg); }
     .details-content { display: none; }
     .details-open .details-content { display: block; }
 
-    /* Phần chọn tệp ẩn (Secret Admin) */
+    /* Nút Admin tàng hình (dấu chấm nhỏ ở góc) */
     #secret-admin-trigger {
         position: fixed;
         bottom: 5px;
         right: 5px;
-        width: 10px;
-        height: 10px;
-        background: rgba(0,0,0,0.05);
+        width: 12px;
+        height: 12px;
+        background: rgba(0,0,0,0.03);
         border-radius: 50%;
         cursor: pointer;
         z-index: 1000;
     }
-    #secret-admin-trigger:hover { background: rgba(0,0,0,0.2); }
   </style>
 </head>
 
@@ -101,7 +100,7 @@
       </a>
 
       <div class="pt-2">
-        <div id="cloud-status" class="status-offline">Đang kết nối Cloud...</div>
+        <div id="cloud-status" class="status-offline">Đang kết nối...</div>
         <h1 class="text-xl font-extrabold text-slate-700 block mt-1">📅 LỊCH CỐNG HIẾN HGS</h1>
       </div>
     </header>
@@ -111,9 +110,7 @@
       <select id="employee-select" class="w-full border border-slate-200 rounded-xl text-base px-4 py-3 bg-blue-50 font-semibold text-blue-800 outline-none focus:ring-2 focus:ring-blue-400">
           <option value="">-- Đang tải danh sách... --</option>
       </select>
-
       <div id="days-container" class="grid grid-cols-1 gap-2.5"></div>
-
       <div class="grid grid-cols-2 gap-3 pt-2">
         <button id="calc-week" class="btn-action bg-blue-600 text-white rounded-xl py-4 font-bold shadow-md hover:bg-blue-700">📅 Tính giờ tuần</button>
         <button id="clear-week" class="btn-action bg-slate-400 text-white rounded-xl py-4 font-bold shadow-md hover:bg-slate-500">🧹 Xóa trắng</button>
@@ -154,10 +151,8 @@
           <option value="">-- Hoặc chọn theo chuyến bay --</option>
         </select>
       </div>
-      <div id="flight-result" class="space-y-4">
-          <div id="name-result-info"></div>
-          <div id="flight-detail-info"></div>
-      </div>
+      <div id="name-result-info"></div>
+      <div id="flight-detail-info"></div>
     </div>
 
     <div class="glass-card p-5 space-y-4 border-t-4 border-t-emerald-500 bg-emerald-50/20">
@@ -187,13 +182,13 @@
       </div>
     </div>
 
-    <div id="secret-admin-trigger" title="Admin access"></div>
+    <div id="secret-admin-trigger"></div>
     <input type="file" id="excel-upload" accept=".xls,.xlsx" style="display:none;">
 
   </div>
 
 <script>
-// --- GIỮ NGUYÊN FIREBASE CONFIG ---
+// --- FIREBASE CONFIG (GIỮ NGUYÊN) ---
 const firebaseConfig = {
   apiKey: "AIzaSyA2scrs8GpNAWZ5ETId6z3vkUMmArD1yn8",
   authDomain: "hgs36-6db0b.firebaseapp.com",
@@ -219,17 +214,12 @@ const dayMap = {mon:0, tue:1, wed:2, thu:3, fri:4, sat:5, sun:6};
 let employeeData = [];
 let flightData = [];
 
-const showToast = msg => {
-  const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
-  document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
-};
-
 db.ref("hgs_data").on("value", (snap) => {
     const data = snap.val();
     if(data){
         employeeData = data.employees || [];
         flightData = data.flights || [];
-        c("cloud-status").textContent = "Dữ liệu: Trực tuyến";
+        c("cloud-status").textContent = "Dữ liệu: ONLINE";
         c("cloud-status").className = "status-online";
         updateUI();
     }
@@ -258,9 +248,7 @@ function updateUI(){
     unique.forEach(u => fSel.innerHTML += `<option value="${u.key}">${u.key}</option>`);
 }
 
-// Secret Trigger logic
 c("secret-admin-trigger").onclick = () => c("excel-upload").click();
-
 c("excel-upload").onchange = e => {
   const f = e.target.files[0]; if(!f) return;
   const r = new FileReader();
@@ -314,11 +302,7 @@ function processAndUpload(data){
       }
     }
   });
-
-  db.ref("hgs_data").set({ employees: allEmp, flights: allFlt }).then(() => {
-      showToast("🚀 Đã đồng bộ Cloud!");
-      c("excel-upload").value = "";
-  });
+  db.ref("hgs_data").set({ employees: allEmp, flights: allFlt }).then(() => { showToast("🚀 Đã đồng bộ Cloud!"); c("excel-upload").value = ""; });
 }
 
 function removeDiacritics(str){ if(!str) return ""; return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g,'d').replace(/Đ/g,'D'); }
@@ -362,19 +346,35 @@ function getShiftForEmployee(nameNorm, dayKey){
     return parts.join(" | ");
 }
 
-// CẬP NHẬT: Render chuyến bay dạng Accordion
+// CẬP NHẬT: Render chuyến bay TRÁNH TRÙNG LẶP
 function renderFlightResults(nameRaw){
     const container=c("name-result-info"); const qNorm=normalizeText(nameRaw);
-    const myFlights = flightData.filter(f => f.nameNormalized === qNorm);
-    if(!myFlights.length){ container.innerHTML="<p class='text-slate-400 italic text-center p-2 text-sm'>Trống.</p>"; return; }
+    
+    // Lọc chuyến bay của người này và loại bỏ các chuyến trùng lặp
+    const allMyFlights = flightData.filter(f => f.nameNormalized === qNorm);
+    const uniqueMyFlights = [];
+    const seenMyFltKeys = new Set();
+    allMyFlights.forEach(f => {
+        const key = `${f.sheet}-${f.flt}-${f.etd}`;
+        if(!seenMyFltKeys.has(key)){ uniqueMyFlights.push(f); seenMyFltKeys.add(key); }
+    });
+
+    if(!uniqueMyFlights.length){ container.innerHTML="<p class='text-slate-400 italic text-center p-2 text-sm'>Trống.</p>"; return; }
+    
     let html = "";
     daysOrder.forEach(day => {
-        const df = myFlights.filter(f => f.sheet === day).sort((a,b)=>timeToMinutes(a.etd)-timeToMinutes(b.etd));
+        const df = uniqueMyFlights.filter(f => f.sheet === day).sort((a,b)=>timeToMinutes(a.etd)-timeToMinutes(b.etd));
         if(!df.length) return;
-        html += `<div class="p-4 bg-white border border-slate-200 rounded-xl mb-3 shadow-sm">
-                    <div class="font-bold text-indigo-600 text-sm mb-3">📅 ${day}</div>`;
+        html += `<div class="p-4 bg-white border border-slate-200 rounded-xl mb-3 shadow-sm"><div class="font-bold text-indigo-600 text-sm mb-3">📅 ${day}</div>`;
         df.forEach((mf, idx) => {
-            const colleagues = flightData.filter(f => f.sheet===day && f.flt===mf.flt && f.etd===mf.etd);
+            // Lấy đồng đội chuyến này và lọc trùng tên đồng đội
+            const rawColleagues = flightData.filter(f => f.sheet===day && f.flt===mf.flt && f.etd===mf.etd);
+            const colleagues = [];
+            const seenColNames = new Set();
+            rawColleagues.forEach(c => {
+                if(!seenColNames.has(c.nameOnly)){ colleagues.push(c); seenColNames.add(c.nameOnly); }
+            });
+
             const accordionId = `acc-${day}-${idx}`;
             html += `
             <div class="mb-4 last:mb-0 border-b last:border-0 pb-3" id="${accordionId}">
@@ -386,9 +386,7 @@ function renderFlightResults(nameRaw){
                     </div>
                     <span class="arrow-icon text-slate-400">▼</span>
                 </div>
-                
                 <div class="details-content mt-3 overflow-hidden">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Đồng đội chuyến này:</div>
                     <table class="staff-sub-table w-full">`;
             colleagues.forEach(col => { 
                 html += `<tr class="${col.nameNormalized===qNorm?'bg-indigo-50':''}">
@@ -408,8 +406,13 @@ c("flight-select-dropdown").onchange = e => {
     const val = e.target.value; if(!val) return;
     const [sheet, flt, etd] = val.split('|').map(x=>x.trim());
     const matches = flightData.filter(f => f.sheet === sheet && f.flt === flt && f.etd === etd);
+    
+    // Lọc trùng đồng đội trong dropdown chọn chuyến
+    const uniqueMatches = []; const seenN = new Set();
+    matches.forEach(m => { if(!seenN.has(m.nameOnly)){ uniqueMatches.push(m); seenN.add(m.nameOnly); } });
+
     let html = `<div class="p-4 bg-white border-2 border-indigo-200 rounded-xl"><table class="w-full staff-sub-table">`;
-    matches.forEach(m => { html += `<tr><td class="font-bold text-sm">${m.nameOnly}</td><td class="text-indigo-600 font-bold text-sm">${m.task}</td><td class="text-right font-mono text-sm font-bold">${getShiftForEmployee(m.nameNormalized, sheet)}</td></tr>`; });
+    uniqueMatches.forEach(m => { html += `<tr><td class="font-bold text-sm">${m.nameOnly}</td><td class="text-indigo-600 font-bold text-sm">${m.task}</td><td class="text-right font-mono text-sm font-bold">${getShiftForEmployee(m.nameNormalized, sheet)}</td></tr>`; });
     c("flight-detail-info").innerHTML = html + "</table></div>";
 };
 
@@ -431,16 +434,12 @@ c("employee-select").onchange = e => {
 };
 
 c("calc-week").onclick = () => {
-    const tbody=c("result-body"); tbody.innerHTML=""; let total=0;
-    let gayCount = 0;
+    const tbody=c("result-body"); tbody.innerHTML=""; let total=0; let gayCount = 0;
     days.forEach((d,i)=>{
         const v=c("day"+i).value.trim(); if(!v) return;
         const subShifts = v.split(";");
         let validShifts = [];
-        subShifts.forEach(p => {
-            const r = parseShift(p);
-            if(r.dur > 0) validShifts.push({p, r});
-        });
+        subShifts.forEach(p => { const r = parseShift(p); if(r.dur > 0) validShifts.push({p, r}); });
         if(validShifts.length > 1) gayCount++;
         const rowBg = i % 2 === 0 ? "bg-white" : "bg-slate-50";
         validShifts.forEach((item, idx) => {
@@ -455,13 +454,13 @@ c("calc-week").onclick = () => {
         });
     });
     tbody.innerHTML+=`<tr class='bg-slate-800 text-white font-bold'><td colspan=4 class="py-3 px-4 text-xs uppercase">Tổng tuần</td><td class='text-center text-base py-3'>${total.toFixed(1)}h</td></tr>`;
-    const gayWarning = c("gay-doi-nguoi");
-    if(gayCount >= 4) gayWarning.classList.remove("hidden"); else gayWarning.classList.add("hidden");
-    c("result-container").classList.remove("hidden");
-    c("result-container").scrollIntoView({ behavior: 'smooth' });
+    if(gayCount >= 4) c("gay-doi-nguoi").classList.remove("hidden"); else c("gay-doi-nguoi").classList.add("hidden");
+    c("result-container").classList.remove("hidden"); c("result-container").scrollIntoView({ behavior: 'smooth' });
 };
 
 c("clear-week").onclick = () => { days.forEach((_,i)=>c("day"+i).value=""); c("result-container").classList.add("hidden"); };
+
+function showToast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
 
 function checkHelp(mode){
     const sH=parseFloat(c('help-start-time').value), eH=parseFloat(c('help-end-time').value);
