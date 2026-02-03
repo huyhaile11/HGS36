@@ -83,6 +83,29 @@
         cursor: pointer;
         z-index: 1000;
     }
+
+    /* HIỆU ỨNG NÚT MUA BÁN CA MỚI */
+    @keyframes pulse-red {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .btn-muaban {
+      animation: pulse-red 2s infinite;
+      background: linear-gradient(90deg, #ef4444, #f59e0b);
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 1rem;
+      color: white;
+      font-weight: 900;
+      text-align: center;
+      margin-top: 15px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .btn-muaban:active { transform: scale(0.95); }
   </style>
 </head>
 
@@ -102,6 +125,10 @@
       <div class="pt-2">
         <div id="cloud-status" class="status-offline">Đang kết nối...</div>
         <h1 class="text-xl font-extrabold text-slate-700 block mt-1">📅 LỊCH CỐNG HIẾN HGS</h1>
+        
+        <a href="https://huyhaile11.github.io/banca/" target="_blank" class="btn-muaban">
+           🛒 MUA BÁN CA BẤM VÀO ĐÂY 🛒
+        </a>
       </div>
     </header>
 
@@ -346,11 +373,8 @@ function getShiftForEmployee(nameNorm, dayKey){
     return parts.join(" | ");
 }
 
-// CẬP NHẬT: Render chuyến bay TRÁNH TRÙNG LẶP
 function renderFlightResults(nameRaw){
     const container=c("name-result-info"); const qNorm=normalizeText(nameRaw);
-    
-    // Lọc chuyến bay của người này và loại bỏ các chuyến trùng lặp
     const allMyFlights = flightData.filter(f => f.nameNormalized === qNorm);
     const uniqueMyFlights = [];
     const seenMyFltKeys = new Set();
@@ -367,7 +391,6 @@ function renderFlightResults(nameRaw){
         if(!df.length) return;
         html += `<div class="p-4 bg-white border border-slate-200 rounded-xl mb-3 shadow-sm"><div class="font-bold text-indigo-600 text-sm mb-3">📅 ${day}</div>`;
         df.forEach((mf, idx) => {
-            // Lấy đồng đội chuyến này và lọc trùng tên đồng đội
             const rawColleagues = flightData.filter(f => f.sheet===day && f.flt===mf.flt && f.etd===mf.etd);
             const colleagues = [];
             const seenColNames = new Set();
@@ -406,11 +429,8 @@ c("flight-select-dropdown").onchange = e => {
     const val = e.target.value; if(!val) return;
     const [sheet, flt, etd] = val.split('|').map(x=>x.trim());
     const matches = flightData.filter(f => f.sheet === sheet && f.flt === flt && f.etd === etd);
-    
-    // Lọc trùng đồng đội trong dropdown chọn chuyến
     const uniqueMatches = []; const seenN = new Set();
     matches.forEach(m => { if(!seenN.has(m.nameOnly)){ uniqueMatches.push(m); seenN.add(m.nameOnly); } });
-
     let html = `<div class="p-4 bg-white border-2 border-indigo-200 rounded-xl"><table class="w-full staff-sub-table">`;
     uniqueMatches.forEach(m => { html += `<tr><td class="font-bold text-sm">${m.nameOnly}</td><td class="text-indigo-600 font-bold text-sm">${m.task}</td><td class="text-right font-mono text-sm font-bold">${getShiftForEmployee(m.nameNormalized, sheet)}</td></tr>`; });
     c("flight-detail-info").innerHTML = html + "</table></div>";
