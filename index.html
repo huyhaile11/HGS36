@@ -13,6 +13,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
   <style>
+    /* Tăng font chữ tổng thể cho mobile */
+    html { font-size: 17px; } 
     body { 
       font-family: 'Plus Jakarta Sans', sans-serif; 
       background: linear-gradient(135deg, #fff5f5 0%, #f0f4f8 100%); 
@@ -43,15 +45,14 @@
       100% { opacity: 0; transform: translate(-50%, -20px); }
     }
     
-    .day-container { border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; }
-    /* Nền xen kẽ cho phần nhập liệu */
+    .day-container { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; }
     .day-even { background: #ffffff; }
     .day-odd { background: #f8fafc; }
 
-    .staff-sub-table td { padding: 6px 8px !important; }
+    .staff-sub-table td { padding: 8px 10px !important; font-size: 0.8rem; }
 
     #cloud-status {
-      font-size: 9px; font-weight: 800; padding: 2px 10px; border-radius: 20px;
+      font-size: 10px; font-weight: 800; padding: 2px 10px; border-radius: 20px;
       text-transform: uppercase;
     }
     .status-online { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
@@ -63,6 +64,26 @@
       -webkit-text-fill-color: transparent;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
+
+    /* Hiệu ứng mũi tên xoay */
+    .arrow-icon { transition: transform 0.3s ease; }
+    .details-open .arrow-icon { transform: rotate(180deg); }
+    .details-content { display: none; }
+    .details-open .details-content { display: block; }
+
+    /* Phần chọn tệp ẩn (Secret Admin) */
+    #secret-admin-trigger {
+        position: fixed;
+        bottom: 5px;
+        right: 5px;
+        width: 10px;
+        height: 10px;
+        background: rgba(0,0,0,0.05);
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 1000;
+    }
+    #secret-admin-trigger:hover { background: rgba(0,0,0,0.2); }
   </style>
 </head>
 
@@ -75,7 +96,7 @@
       </h2>
       
       <a href="https://www.facebook.com/huy.hai.333030" target="_blank"
-         class="inline-block px-5 py-1.5 bg-white/70 text-blue-600 font-bold text-xs rounded-full shadow-sm border border-blue-100 hover:bg-white transition-all">
+         class="inline-block px-5 py-2 bg-white/70 text-blue-600 font-bold text-sm rounded-full shadow-sm border border-blue-100 hover:bg-white transition-all">
         ✨ Created by Hải 9 ✨
       </a>
 
@@ -87,15 +108,15 @@
 
     <div class="glass-card p-5 space-y-4">
       <div class="section-title">📝 Xem lịch cá nhân</div>
-      <select id="employee-select" class="w-full border border-slate-200 rounded-xl text-sm px-4 py-3 bg-blue-50 font-semibold text-blue-800 outline-none focus:ring-2 focus:ring-blue-400">
+      <select id="employee-select" class="w-full border border-slate-200 rounded-xl text-base px-4 py-3 bg-blue-50 font-semibold text-blue-800 outline-none focus:ring-2 focus:ring-blue-400">
           <option value="">-- Đang tải danh sách... --</option>
       </select>
 
       <div id="days-container" class="grid grid-cols-1 gap-2.5"></div>
 
       <div class="grid grid-cols-2 gap-3 pt-2">
-        <button id="calc-week" class="btn-action bg-blue-600 text-white rounded-xl py-3 font-bold shadow-md hover:bg-blue-700">📅 Tính giờ tuần</button>
-        <button id="clear-week" class="btn-action bg-slate-400 text-white rounded-xl py-3 font-bold shadow-md hover:bg-slate-500">🧹 Xóa trắng</button>
+        <button id="calc-week" class="btn-action bg-blue-600 text-white rounded-xl py-4 font-bold shadow-md hover:bg-blue-700">📅 Tính giờ tuần</button>
+        <button id="clear-week" class="btn-action bg-slate-400 text-white rounded-xl py-4 font-bold shadow-md hover:bg-slate-500">🧹 Xóa trắng</button>
       </div>
     </div>
 
@@ -115,7 +136,7 @@
           <tbody id="result-body" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
-      <div id="gay-doi-nguoi" class="hidden mt-4 text-center text-red-600 font-bold text-sm animate-pulse italic">
+      <div id="gay-doi-nguoi" class="hidden mt-4 text-center text-red-600 font-bold text-base animate-pulse italic">
         ⚠️ Tuần này bạn gãy đôi người, cố lên nhé!
       </div>
     </div>
@@ -125,11 +146,11 @@
       <div class="grid grid-cols-1 gap-3">
         <div class="relative">
           <input id="search-name" type="text" placeholder="Tìm tên nhân viên..."
-                 class="w-full border border-slate-200 rounded-xl px-4 py-3 pl-10 text-sm focus:ring-2 focus:ring-indigo-400 outline-none shadow-sm" autocomplete="off">
-          <span class="absolute left-3 top-3.5 opacity-40">👤</span>
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 pl-10 text-base focus:ring-2 focus:ring-indigo-400 outline-none shadow-sm" autocomplete="off">
+          <span class="absolute left-3 top-4 opacity-40">👤</span>
           <div id="suggestions" class="absolute w-full bg-white border border-slate-200 rounded-xl shadow-xl mt-1 hidden z-50 max-h-60 overflow-y-auto"></div>
         </div>
-        <select id="flight-select-dropdown" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-indigo-50 font-medium text-indigo-900 outline-none focus:ring-2 focus:ring-indigo-400">
+        <select id="flight-select-dropdown" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base bg-indigo-50 font-medium text-indigo-900 outline-none focus:ring-2 focus:ring-indigo-400">
           <option value="">-- Hoặc chọn theo chuyến bay --</option>
         </select>
       </div>
@@ -143,40 +164,36 @@
       <div class="section-title text-emerald-700">🤝 Tìm người làm hộ</div>
       <div class="grid grid-cols-2 gap-3">
         <div class="p-3 bg-white rounded-xl border border-emerald-100">
-          <p class="text-[9px] font-bold text-emerald-600 uppercase">Bắt đầu</p>
+          <p class="text-[10px] font-bold text-emerald-600 uppercase">Bắt đầu</p>
           <div class="flex gap-1">
-            <select id="help-start-day" class="flex-1 bg-transparent text-xs font-semibold outline-none"></select>
-            <input id="help-start-time" type="number" step="0.5" placeholder="0.0" class="w-10 text-center border-b border-emerald-200 font-bold text-emerald-700 text-sm">
+            <select id="help-start-day" class="flex-1 bg-transparent text-sm font-semibold outline-none"></select>
+            <input id="help-start-time" type="number" step="0.5" placeholder="0.0" class="w-12 text-center border-b border-emerald-200 font-bold text-emerald-700 text-base">
           </div>
         </div>
         <div class="p-3 bg-white rounded-xl border border-emerald-100">
-          <p class="text-[9px] font-bold text-emerald-600 uppercase">Kết thúc</p>
+          <p class="text-[10px] font-bold text-emerald-600 uppercase">Kết thúc</p>
           <div class="flex gap-1">
-            <select id="help-end-day" class="flex-1 bg-transparent text-xs font-semibold outline-none"></select>
-            <input id="help-end-time" type="number" step="0.5" placeholder="0.0" class="w-10 text-center border-b border-emerald-200 font-bold text-emerald-700 text-sm">
+            <select id="help-end-day" class="flex-1 bg-transparent text-sm font-semibold outline-none"></select>
+            <input id="help-end-time" type="number" step="0.5" placeholder="0.0" class="w-12 text-center border-b border-emerald-200 font-bold text-emerald-700 text-base">
           </div>
         </div>
       </div>
       <div class="grid grid-cols-1 gap-2">
-        <button id="btn-find-all" class="btn-action bg-emerald-600 text-white font-bold py-2.5 rounded-xl shadow-md text-sm">🔍 Tìm tất cả</button>
-        <button id="btn-find-k36" class="btn-action bg-white border-2 border-emerald-600 text-emerald-600 font-bold py-2 rounded-xl text-sm">👥 Tìm riêng K36</button>
+        <button id="btn-find-all" class="btn-action bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-md text-base">🔍 Tìm tất cả</button>
+        <button id="btn-find-k36" class="btn-action bg-white border-2 border-emerald-600 text-emerald-600 font-bold py-3 rounded-xl text-base">👥 Tìm riêng K36</button>
       </div>
       <div id="help-result" class="hidden p-3 bg-white rounded-xl border border-emerald-200 max-h-40 overflow-y-auto">
-          <ul id="help-list" class="grid grid-cols-2 gap-2 text-xs font-medium text-slate-600"></ul>
+          <ul id="help-list" class="grid grid-cols-2 gap-2 text-sm font-medium text-slate-600"></ul>
       </div>
     </div>
 
-    <div class="pt-8 opacity-40 hover:opacity-100 transition-opacity duration-500">
-      <div class="glass-card p-3 max-w-xs mx-auto text-center border-dashed border-2">
-        <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">⚙️ Admin Update File</p>
-        <input type="file" id="excel-upload" accept=".xls,.xlsx"
-               class="w-full text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-slate-100 file:text-slate-600 cursor-pointer">
-      </div>
-    </div>
+    <div id="secret-admin-trigger" title="Admin access"></div>
+    <input type="file" id="excel-upload" accept=".xls,.xlsx" style="display:none;">
 
   </div>
 
 <script>
+// --- GIỮ NGUYÊN FIREBASE CONFIG ---
 const firebaseConfig = {
   apiKey: "AIzaSyA2scrs8GpNAWZ5ETId6z3vkUMmArD1yn8",
   authDomain: "hgs36-6db0b.firebaseapp.com",
@@ -240,6 +257,9 @@ function updateUI(){
     unique.sort((a,b) => (daysOrder.indexOf(a.sheet) - daysOrder.indexOf(b.sheet)) || a.etd.localeCompare(b.etd));
     unique.forEach(u => fSel.innerHTML += `<option value="${u.key}">${u.key}</option>`);
 }
+
+// Secret Trigger logic
+c("secret-admin-trigger").onclick = () => c("excel-upload").click();
 
 c("excel-upload").onchange = e => {
   const f = e.target.files[0]; if(!f) return;
@@ -329,7 +349,7 @@ function createInputs(){
     const box = c("days-container"); box.innerHTML = "";
     days.forEach((d,i)=>{
         const bgClass = i % 2 === 0 ? "day-even" : "day-odd";
-        box.innerHTML += `<div class="day-container ${bgClass}"><label class="block text-[9px] font-extrabold text-slate-400 uppercase mb-0.5">${d}</label><input id="day${i}" type="text" placeholder="Nhập ca..." class="w-full bg-transparent text-sm font-bold text-slate-700 outline-none"></div>`;
+        box.innerHTML += `<div class="day-container ${bgClass}"><label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-0.5">${d}</label><input id="day${i}" type="text" placeholder="Nhập ca..." class="w-full bg-transparent text-base font-bold text-slate-700 outline-none"></div>`;
     });
     const opts = days.map((d,i)=>`<option value="${daysOrder[i].toLowerCase()}">${d}</option>`).join("");
     c('help-start-day').innerHTML = opts; c('help-end-day').innerHTML = opts;
@@ -342,20 +362,42 @@ function getShiftForEmployee(nameNorm, dayKey){
     return parts.join(" | ");
 }
 
+// CẬP NHẬT: Render chuyến bay dạng Accordion
 function renderFlightResults(nameRaw){
     const container=c("name-result-info"); const qNorm=normalizeText(nameRaw);
     const myFlights = flightData.filter(f => f.nameNormalized === qNorm);
-    if(!myFlights.length){ container.innerHTML="<p class='text-slate-400 italic text-center p-2 text-xs'>Trống.</p>"; return; }
+    if(!myFlights.length){ container.innerHTML="<p class='text-slate-400 italic text-center p-2 text-sm'>Trống.</p>"; return; }
     let html = "";
     daysOrder.forEach(day => {
         const df = myFlights.filter(f => f.sheet === day).sort((a,b)=>timeToMinutes(a.etd)-timeToMinutes(b.etd));
         if(!df.length) return;
-        html += `<div class="p-3 bg-white border border-slate-200 rounded-xl mb-2"><div class="font-bold text-indigo-600 text-sm mb-2">📅 ${day}</div>`;
-        df.forEach(mf => {
+        html += `<div class="p-4 bg-white border border-slate-200 rounded-xl mb-3 shadow-sm">
+                    <div class="font-bold text-indigo-600 text-sm mb-3">📅 ${day}</div>`;
+        df.forEach((mf, idx) => {
             const colleagues = flightData.filter(f => f.sheet===day && f.flt===mf.flt && f.etd===mf.etd);
-            html += `<div class="mb-3 last:mb-0"><div class="flex items-center gap-2 mb-1.5"><span class="bg-indigo-600 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">${mf.flt}</span><span class="text-xs font-bold text-slate-700">⏰ ${mf.etd}</span></div><div class="text-[9px] font-bold text-rose-500 uppercase mb-1">Vị trí: ${mf.task || "..."}</div><table class="staff-sub-table w-full text-[10px]">`;
-            colleagues.forEach(col => { html += `<tr class="${col.nameNormalized===qNorm?'bg-indigo-50':''}"><td>${col.nameOnly}</td><td>${col.task}</td><td class="text-right font-mono font-bold">${getShiftForEmployee(col.nameNormalized, day)}</td></tr>`; });
-            html += `</table></div>`;
+            const accordionId = `acc-${day}-${idx}`;
+            html += `
+            <div class="mb-4 last:mb-0 border-b last:border-0 pb-3" id="${accordionId}">
+                <div class="flex items-center justify-between cursor-pointer" onclick="document.getElementById('${accordionId}').classList.toggle('details-open')">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[11px] font-bold uppercase">${mf.flt}</span>
+                        <span class="text-sm font-bold text-slate-700">⏰ ${mf.etd}</span>
+                        <span class="text-[10px] font-black text-rose-500 uppercase">Pos: ${mf.task || "..." }</span>
+                    </div>
+                    <span class="arrow-icon text-slate-400">▼</span>
+                </div>
+                
+                <div class="details-content mt-3 overflow-hidden">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Đồng đội chuyến này:</div>
+                    <table class="staff-sub-table w-full">`;
+            colleagues.forEach(col => { 
+                html += `<tr class="${col.nameNormalized===qNorm?'bg-indigo-50':''}">
+                            <td class="font-bold">${col.nameOnly}</td>
+                            <td class="text-indigo-600 font-medium">${col.task}</td>
+                            <td class="text-right font-mono font-bold">${getShiftForEmployee(col.nameNormalized, day)}</td>
+                        </tr>`; 
+            });
+            html += `</table></div></div>`;
         });
         html += `</div>`;
     });
@@ -366,8 +408,8 @@ c("flight-select-dropdown").onchange = e => {
     const val = e.target.value; if(!val) return;
     const [sheet, flt, etd] = val.split('|').map(x=>x.trim());
     const matches = flightData.filter(f => f.sheet === sheet && f.flt === flt && f.etd === etd);
-    let html = `<div class="p-3 bg-white border-2 border-indigo-200 rounded-xl"><table class="w-full staff-sub-table">`;
-    matches.forEach(m => { html += `<tr><td class="font-bold text-[10px]">${m.nameOnly}</td><td class="text-indigo-600 font-bold text-[10px]">${m.task}</td><td class="text-right font-mono text-[9px] font-bold">${getShiftForEmployee(m.nameNormalized, sheet)}</td></tr>`; });
+    let html = `<div class="p-4 bg-white border-2 border-indigo-200 rounded-xl"><table class="w-full staff-sub-table">`;
+    matches.forEach(m => { html += `<tr><td class="font-bold text-sm">${m.nameOnly}</td><td class="text-indigo-600 font-bold text-sm">${m.task}</td><td class="text-right font-mono text-sm font-bold">${getShiftForEmployee(m.nameNormalized, sheet)}</td></tr>`; });
     c("flight-detail-info").innerHTML = html + "</table></div>";
 };
 
@@ -376,7 +418,7 @@ c("search-name").oninput = e => {
     if(!q){ box.classList.add("hidden"); return; }
     const uniqueNames = [...new Set(flightData.map(f=>f.nameOnly))].filter(n=>normalizeText(n).includes(q)).slice(0,10);
     if(!uniqueNames.length){ box.classList.add("hidden"); return; }
-    box.innerHTML = uniqueNames.map(n=>`<div class="px-4 py-2 hover:bg-indigo-50 cursor-pointer font-bold text-slate-700 text-xs">${n}</div>`).join("");
+    box.innerHTML = uniqueNames.map(n=>`<div class="px-4 py-3 hover:bg-indigo-50 cursor-pointer font-bold text-slate-700 text-sm">${n}</div>`).join("");
     box.classList.remove("hidden");
     box.querySelectorAll("div").forEach(div=> div.onclick=()=>{ c("search-name").value=div.textContent; box.classList.add("hidden"); renderFlightResults(div.textContent); });
 };
@@ -388,11 +430,9 @@ c("employee-select").onchange = e => {
     c("search-name").value = n; renderFlightResults(n);
 };
 
-// --- TÍNH TOÁN BẢNG TỔNG HỢP (CẬP NHẬT) ---
 c("calc-week").onclick = () => {
     const tbody=c("result-body"); tbody.innerHTML=""; let total=0;
     let gayCount = 0;
-
     days.forEach((d,i)=>{
         const v=c("day"+i).value.trim(); if(!v) return;
         const subShifts = v.split(";");
@@ -401,30 +441,22 @@ c("calc-week").onclick = () => {
             const r = parseShift(p);
             if(r.dur > 0) validShifts.push({p, r});
         });
-
-        // Đếm ngày làm ca gãy
         if(validShifts.length > 1) gayCount++;
-
         const rowBg = i % 2 === 0 ? "bg-white" : "bg-slate-50";
-
         validShifts.forEach((item, idx) => {
             tbody.innerHTML+=`<tr class="${rowBg} hover:bg-blue-50/50">
-                <td class="font-bold py-2 px-4">${idx === 0 ? d : ""}</td>
-                <td><span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-bold">${item.p}</span></td>
-                <td class='text-center font-mono text-xs'>${fmtHoursToHHMM(item.r.start)}</td>
-                <td class='text-center font-mono text-xs'>${fmtHoursToHHMM(item.r.end)}</td>
-                <td class='text-center font-bold text-blue-600 text-xs'>${item.r.dur.toFixed(1)}h</td>
+                <td class="font-bold py-3 px-4">${idx === 0 ? d : ""}</td>
+                <td><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[11px] font-bold">${item.p}</span></td>
+                <td class='text-center font-mono text-sm'>${fmtHoursToHHMM(item.r.start)}</td>
+                <td class='text-center font-mono text-sm'>${fmtHoursToHHMM(item.r.end)}</td>
+                <td class='text-center font-bold text-blue-600 text-sm'>${item.r.dur.toFixed(1)}h</td>
             </tr>`;
             total+=item.r.dur;
         });
     });
-    tbody.innerHTML+=`<tr class='bg-slate-800 text-white font-bold'><td colspan=4 class="py-2 px-4 text-[10px] uppercase">Tổng tuần</td><td class='text-center text-sm py-2'>${total.toFixed(1)}h</td></tr>`;
-    
-    // Hiện thông báo nếu gãy 4 lần trở lên
+    tbody.innerHTML+=`<tr class='bg-slate-800 text-white font-bold'><td colspan=4 class="py-3 px-4 text-xs uppercase">Tổng tuần</td><td class='text-center text-base py-3'>${total.toFixed(1)}h</td></tr>`;
     const gayWarning = c("gay-doi-nguoi");
-    if(gayCount >= 4) gayWarning.classList.remove("hidden");
-    else gayWarning.classList.add("hidden");
-
+    if(gayCount >= 4) gayWarning.classList.remove("hidden"); else gayWarning.classList.add("hidden");
     c("result-container").classList.remove("hidden");
     c("result-container").scrollIntoView({ behavior: 'smooth' });
 };
@@ -445,7 +477,7 @@ function checkHelp(mode){
         }
         if(!busy) free.push(e.name);
     });
-    c('help-list').innerHTML = free.length ? free.map(n=>`<li class="bg-emerald-50 text-emerald-800 p-1.5 rounded border border-emerald-100">🟢 ${n}</li>`).join("") : "<li>Không có ai rảnh</li>";
+    c('help-list').innerHTML = free.length ? free.map(n=>`<li class="bg-emerald-50 text-emerald-800 p-2 rounded border border-emerald-100">🟢 ${n}</li>`).join("") : "<li>Không có ai rảnh</li>";
     c('help-result').classList.remove("hidden");
 }
 c("btn-find-all").onclick=()=>checkHelp('ALL');
