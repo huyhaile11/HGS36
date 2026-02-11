@@ -13,7 +13,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
   <style>
-    /* Font chữ lớn cho điện thoại */
     html { font-size: 17px; } 
     body { 
       font-family: 'Plus Jakarta Sans', sans-serif; 
@@ -65,13 +64,11 @@
       text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
 
-    /* Accordion Arrow */
     .arrow-icon { transition: transform 0.3s ease; }
     .details-open .arrow-icon { transform: rotate(180deg); }
     .details-content { display: none; }
     .details-open .details-content { display: block; }
 
-    /* Nút Admin tàng hình (dấu chấm nhỏ ở góc) */
     #secret-admin-trigger {
         position: fixed;
         bottom: 5px;
@@ -84,7 +81,6 @@
         z-index: 1000;
     }
 
-    /* HIỆU ỨNG NÚT MUA BÁN CA MỚI */
     @keyframes pulse-red {
       0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
       70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
@@ -126,6 +122,18 @@
         <div id="cloud-status" class="status-offline">Đang kết nối...</div>
         <h1 class="text-xl font-extrabold text-slate-700 block mt-1">📅 LỊCH CỐNG HIẾN HGS</h1>
         
+        <div class="mt-4 px-2 flex gap-2 items-end">
+          <div class="flex-1 text-left">
+            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Chọn tuần làm việc:</label>
+            <select id="week-select" class="w-full border-2 border-blue-100 rounded-xl px-4 py-3 bg-white font-bold text-blue-800 shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
+                <option value="">-- Đang tải dữ liệu... --</option>
+            </select>
+          </div>
+          <button id="btn-delete-week" class="bg-rose-50 text-rose-500 p-3 rounded-xl border border-rose-100 hover:bg-rose-500 hover:text-white transition-colors" title="Xoá tuần này">
+            🗑️
+          </button>
+        </div>
+
         <a href="https://huyhaile11.github.io/banca/" target="_blank" class="btn-muaban">
            🛒 MUA BÁN CA BẤM VÀO ĐÂY 🛒
         </a>
@@ -135,7 +143,7 @@
     <div class="glass-card p-5 space-y-4">
       <div class="section-title">📝 Xem lịch cá nhân</div>
       <select id="employee-select" class="w-full border border-slate-200 rounded-xl text-base px-4 py-3 bg-blue-50 font-semibold text-blue-800 outline-none focus:ring-2 focus:ring-blue-400">
-          <option value="">-- Đang tải danh sách... --</option>
+          <option value="">-- Chọn nhân viên --</option>
       </select>
       <div id="days-container" class="grid grid-cols-1 gap-2.5"></div>
       <div class="grid grid-cols-2 gap-3 pt-2">
@@ -215,7 +223,7 @@
   </div>
 
 <script>
-// --- FIREBASE CONFIG (GIỮ NGUYÊN) ---
+// --- FIREBASE CONFIG ---
 const firebaseConfig = {
   apiKey: "AIzaSyA2scrs8GpNAWZ5ETId6z3vkUMmArD1yn8",
   authDomain: "hgs36-6db0b.firebaseapp.com",
@@ -238,19 +246,59 @@ const team7c = ["HẢI 9", "HUY 14", "DŨNG 12", "KHẢI 2", "HUY 12", "HẰNG 1
 const teamPR = ["NGHĨA 1", "TRÂM 3", "HOÀNG 10", "HUY 11", "THÚY 7", "ANH 10", "TUẤN 11", "LY 2", "SƠN 12", "KHÁNH 2"];
 const dayMap = {mon:0, tue:1, wed:2, thu:3, fri:4, sat:5, sun:6};
 
+let allWeeks = {};
 let employeeData = [];
 let flightData = [];
+let pendingFileName = "";
 
-db.ref("hgs_data").on("value", (snap) => {
+// Lắng nghe dữ liệu đa tuần
+db.ref("hgs_weeks").on("value", (snap) => {
     const data = snap.val();
     if(data){
-        employeeData = data.employees || [];
-        flightData = data.flights || [];
+        allWeeks = data;
         c("cloud-status").textContent = "Dữ liệu: ONLINE";
         c("cloud-status").className = "status-online";
-        updateUI();
+        updateWeekDropdown();
+    } else {
+        c("cloud-status").textContent = "Dữ liệu: TRỐNG";
+        c("cloud-status").className = "status-offline";
+        c("week-select").innerHTML = '<option value="">-- Chưa có dữ liệu --</option>';
     }
 });
+
+function updateWeekDropdown() {
+    const sel = c("week-select");
+    const currentVal = sel.value;
+    const keys = Object.keys(allWeeks).sort().reverse(); // Tuần mới nhất thường nằm ở dưới nên reverse
+    
+    sel.innerHTML = keys.map(k => `<option value="${k}">${k}</option>`).join("");
+    
+    // Nếu chưa chọn gì hoặc tuần cũ bị xoá, mặc định chọn tuần đầu tiên
+    if (!currentVal || !allWeeks[currentVal]) {
+        sel.value = keys[0];
+        loadWeekData(keys[0]);
+    } else {
+        sel.value = currentVal;
+        loadWeekData(currentVal);
+    }
+}
+
+function loadWeekData(weekKey) {
+    if (!allWeeks[weekKey]) return;
+    employeeData = allWeeks[weekKey].employees || [];
+    flightData = allWeeks[weekKey].flights || [];
+    updateUI();
+}
+
+c("week-select").onchange = e => loadWeekData(e.target.value);
+
+c("btn-delete-week").onclick = () => {
+    const week = c("week-select").value;
+    if (!week) return;
+    if (confirm(`⚠️ Bạn có chắc muốn xoá hoàn toàn dữ liệu của "${week}" không?`)) {
+        db.ref("hgs_weeks/" + week).remove().then(() => showToast("🗑️ Đã xoá tuần!"));
+    }
+};
 
 function updateUI(){
     const sel = c("employee-select");
@@ -271,13 +319,17 @@ function updateUI(){
         const key = `${f.sheet} | ${f.flt} | ${f.etd}`;
         if(!unique.find(x => x.key === key)) unique.push({key, sheet: f.sheet, etd: f.etd});
     });
-    unique.sort((a,b) => (daysOrder.indexOf(a.sheet) - daysOrder.indexOf(b.sheet)) || a.etd.localeCompare(b.etd));
+    unique.sort((a,b) => (daysOrder.indexOf(a.sheet) - daysOrder.indexOf(b.sheet)) || a.etd.compareLocale ? a.etd.compareLocale(b.etd) : a.etd.localeCompare(b.etd));
     unique.forEach(u => fSel.innerHTML += `<option value="${u.key}">${u.key}</option>`);
+    
+    c("name-result-info").innerHTML = "";
+    c("flight-detail-info").innerHTML = "";
 }
 
 c("secret-admin-trigger").onclick = () => c("excel-upload").click();
 c("excel-upload").onchange = e => {
   const f = e.target.files[0]; if(!f) return;
+  pendingFileName = f.name.replace(/\.[^/.]+$/, ""); // Lấy tên file bỏ đuôi
   const r = new FileReader();
   r.onload = evt => { processAndUpload(new Uint8Array(evt.target.result)); };
   r.readAsArrayBuffer(f);
@@ -329,7 +381,12 @@ function processAndUpload(data){
       }
     }
   });
-  db.ref("hgs_data").set({ employees: allEmp, flights: allFlt }).then(() => { showToast("🚀 Đã đồng bộ Cloud!"); c("excel-upload").value = ""; });
+  
+  // Lưu theo tên file
+  db.ref("hgs_weeks/" + pendingFileName).set({ employees: allEmp, flights: allFlt }).then(() => { 
+      showToast(`🚀 Đã tải lên: ${pendingFileName}`); 
+      c("excel-upload").value = ""; 
+  });
 }
 
 function removeDiacritics(str){ if(!str) return ""; return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g,'d').replace(/Đ/g,'D'); }
