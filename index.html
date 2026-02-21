@@ -70,8 +70,8 @@
     .details-open .details-content { display: block; }
 
     #secret-admin-trigger {
-        position: fixed; bottom: 5px; right: 5px; width: 12px; height: 12px;
-        background: rgba(0,0,0,0.03); border-radius: 50%; cursor: pointer; z-index: 1000;
+        position: fixed; bottom: 0; right: 0; width: 30px; height: 30px;
+        background: transparent; cursor: pointer; z-index: 1000;
     }
 
     @keyframes pulse-red {
@@ -161,9 +161,6 @@
           <tbody id="result-body" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
-      <div id="gay-doi-nguoi" class="hidden mt-4 text-center text-red-600 font-bold text-base animate-pulse italic">
-        ⚠️ Tuần này bạn gãy đôi người, cố lên nhé!
-      </div>
     </div>
 
     <div class="glass-card p-5 space-y-4 border-t-4 border-t-indigo-500">
@@ -187,7 +184,7 @@
       <div class="section-title text-emerald-700">🤝 Tìm người làm hộ</div>
       
       <div class="relative">
-        <label class="text-[10px] font-bold text-emerald-600 uppercase ml-1">Chọn người có thể làm hộ bạn (Hoặc để trống):</label>
+        <label class="text-[10px] font-bold text-emerald-600 uppercase ml-1">Chọn người có thể làm hộ bạn (Để trống nếu tìm tất cả):</label>
         <input id="help-member-search" type="text" placeholder="Gõ tên để tích chọn..."
                class="w-full border border-emerald-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-400 outline-none shadow-sm" autocomplete="off">
         <div id="help-suggestions" class="absolute w-full bg-white border border-slate-200 rounded-xl shadow-xl mt-1 hidden z-50 max-h-48 overflow-y-auto"></div>
@@ -195,6 +192,7 @@
       <div id="selected-help-list" class="flex flex-wrap gap-1 min-h-[40px] p-2 bg-white/50 rounded-xl border border-dashed border-emerald-200">
          <span class="text-xs text-slate-400 italic p-1">Mặc định: Toàn hệ thống</span>
       </div>
+
       <div class="grid grid-cols-2 gap-3">
         <div class="p-3 bg-white rounded-xl border border-emerald-100">
           <p class="text-[10px] font-bold text-emerald-600 uppercase">Bắt đầu</p>
@@ -212,7 +210,7 @@
         </div>
       </div>
       <div class="grid grid-cols-1 gap-2">
-        <button id="btn-find-all" class="btn-action bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-md text-base">🔍 Tìm tất cả</button>
+        <button id="btn-find-all" class="btn-action bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-md text-base">🔍 Tìm trong danh sách trên</button>
         <button id="btn-find-k36" class="btn-action bg-white border-2 border-emerald-600 text-emerald-600 font-bold py-3 rounded-xl text-base">👥 Tìm riêng K36</button>
       </div>
       <div id="help-result" class="hidden p-3 bg-white rounded-xl border border-emerald-200 max-h-40 overflow-y-auto">
@@ -224,7 +222,7 @@
       <div class="section-title text-orange-700">🏆 "Giờ Vàng" Linh Hoạt</div>
       <div class="space-y-3">
         <div class="relative">
-          <label class="text-[10px] font-bold text-orange-600 uppercase ml-1">1. Chọn thành viên cần quét (Hoặc để trống để quét cả K36):</label>
+          <label class="text-[10px] font-bold text-orange-600 uppercase ml-1">1. Chọn thành viên cần quét (Hoặc để trống):</label>
           <input id="golden-member-search" type="text" placeholder="Gõ tên để tích chọn..."
                  class="w-full border border-orange-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-400 outline-none shadow-sm" autocomplete="off">
           <div id="golden-suggestions" class="absolute w-full bg-white border border-slate-200 rounded-xl shadow-xl mt-1 hidden z-50 max-h-48 overflow-y-auto"></div>
@@ -281,7 +279,7 @@ let allWeeks = {};
 let employeeData = [];
 let flightData = [];
 let selectedForGolden = [];
-let selectedForHelp = []; // Mới: Danh sách người làm hộ được chọn
+let selectedForHelp = [];
 
 // --- KẾT NỐI DỮ LIỆU ---
 db.ref("hgs_weeks").on("value", (snap) => {
@@ -298,6 +296,7 @@ function updateWeekDropdown() {
     const sel = c("week-select");
     const currentVal = sel.value;
     const keys = Object.keys(allWeeks).sort().reverse();
+    if(keys.length === 0) { sel.innerHTML = '<option>Chưa có dữ liệu</option>'; return; }
     sel.innerHTML = keys.map(k => `<option value="${k}">${k}</option>`).join("");
     if (!currentVal || !allWeeks[currentVal]) {
         sel.value = keys[0];
@@ -367,14 +366,35 @@ function parseShift(str){
     return {start, end, dur: end-start};
 }
 
-// --- HIỂN THỊ CHUYẾN BAY ---
-function getShiftForEmployee(nameNorm, dayKey){
-    const emp = employeeData.find(e => normalizeText(e.name) === nameNorm);
-    if(!emp || !emp[dayKey.toLowerCase()]) return "OFF";
-    const parts = emp[dayKey.toLowerCase()].split(";").map(p=>{ const r = parseShift(p); return (r && r.dur>0) ? `${fmtHoursToHHMM(r.start)}-${fmtHoursToHHMM(r.end)}` : p; });
-    return parts.join(" | ");
-}
+// --- TÍNH GIỜ TUẦN ---
+c("calc-week").onclick = () => {
+    const tbody=c("result-body"); tbody.innerHTML=""; let total=0;
+    days.forEach((d,i)=>{
+        const v=c("day"+i).value.trim(); if(!v) return;
+        let dayPrinted = false;
+        v.split(";").forEach((p) => {
+            const r = parseShift(p);
+            if(r.dur > 0){
+                tbody.innerHTML+=`<tr class="hover:bg-blue-50/50">
+                    <td class="font-bold py-3 px-4 text-blue-800">${!dayPrinted ? d : ""}</td>
+                    <td><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[11px] font-bold">${p}</span></td>
+                    <td class='text-center font-mono text-sm'>${fmtHoursToHHMM(r.start)}</td>
+                    <td class='text-center font-mono text-sm'>${fmtHoursToHHMM(r.end)}</td>
+                    <td class='text-center font-bold text-blue-600 text-sm'>${r.dur.toFixed(1)}h</td>
+                </tr>`;
+                total+=r.dur;
+                dayPrinted = true;
+            }
+        });
+    });
+    tbody.innerHTML+=`<tr class='bg-slate-800 text-white font-bold'><td colspan=4 class="py-3 px-4 text-xs uppercase">Tổng tuần</td><td class='text-center text-base py-3'>${total.toFixed(1)}h</td></tr>`;
+    c("result-container").classList.remove("hidden");
+    c("result-container").scrollIntoView({ behavior: 'smooth' });
+};
 
+c("clear-week").onclick = () => { days.forEach((_,i)=>c("day"+i).value=""); c("result-container").classList.add("hidden"); };
+
+// --- TÌM KIẾM ---
 function renderFlightResults(nameRaw){
     const container=c("name-result-info"); const qNorm=normalizeText(nameRaw);
     const allMyFlights = flightData.filter(f => f.nameNormalized === qNorm);
@@ -383,7 +403,7 @@ function renderFlightResults(nameRaw){
         const key = `${f.sheet}-${f.flt}-${f.etd}`;
         if(!seenMyFltKeys.has(key)){ uniqueMyFlights.push(f); seenMyFltKeys.add(key); }
     });
-    if(!uniqueMyFlights.length){ container.innerHTML="<p class='text-slate-400 italic text-center p-2 text-sm'>Trống.</p>"; return; }
+    if(!uniqueMyFlights.length){ container.innerHTML="<p class='text-slate-400 italic text-center p-2 text-sm'>Không có chuyến bay.</p>"; return; }
     let html = "";
     daysOrder.forEach(day => {
         const df = uniqueMyFlights.filter(f => f.sheet === day).sort((a,b)=>timeToMinutes(a.etd)-timeToMinutes(b.etd));
@@ -419,7 +439,12 @@ function renderFlightResults(nameRaw){
     container.innerHTML = html;
 }
 
-// --- SỰ KIỆN TÌM KIẾM ---
+function getShiftForEmployee(nameNorm, dayKey){
+    const emp = employeeData.find(e => normalizeText(e.name) === nameNorm);
+    if(!emp || !emp[dayKey.toLowerCase()]) return "OFF";
+    return emp[dayKey.toLowerCase()];
+}
+
 c("search-name").oninput = e => {
     const q = normalizeText(e.target.value); const box = c("suggestions");
     if(!q){ box.classList.add("hidden"); return; }
@@ -444,30 +469,10 @@ c("employee-select").onchange = e => {
     const n = e.target.value; if(!n) return;
     const emp = employeeData.find(x=>x.name===n);
     daysOrder.forEach((d,i)=> c("day"+i).value = emp[d.toLowerCase()] || "");
-    c("search-name").value = n; 
-    renderFlightResults(n);
+    c("search-name").value = n; renderFlightResults(n);
 };
 
-c("calc-week").onclick = () => {
-    const tbody=c("result-body"); tbody.innerHTML=""; let total=0;
-    days.forEach((d,i)=>{
-        const v=c("day"+i).value.trim(); if(!v) return;
-        v.split(";").forEach((p, idx) => {
-            const r = parseShift(p);
-            if(r.dur > 0){
-                tbody.innerHTML+=`<tr class="hover:bg-blue-50/50"><td class="font-bold py-3 px-4">${idx === 0 ? d : ""}</td><td><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[11px] font-bold">${p}</span></td><td class='text-center font-mono text-sm'>${fmtHoursToHHMM(r.start)}</td><td class='text-center font-mono text-sm'>${fmtHoursToHHMM(r.end)}</td><td class='text-center font-bold text-blue-600 text-sm'>${r.dur.toFixed(1)}h</td></tr>`;
-                total+=r.dur;
-            }
-        });
-    });
-    tbody.innerHTML+=`<tr class='bg-slate-800 text-white font-bold'><td colspan=4 class="py-3 px-4 text-xs uppercase">Tổng tuần</td><td class='text-center text-base py-3'>${total.toFixed(1)}h</td></tr>`;
-    c("result-container").classList.remove("hidden");
-    c("result-container").scrollIntoView({ behavior: 'smooth' });
-};
-
-c("clear-week").onclick = () => { days.forEach((_,i)=>c("day"+i).value=""); c("result-container").classList.add("hidden"); };
-
-// --- LOGIC GIỜ VÀNG LINH HOẠT ---
+// --- GIỜ VÀNG ---
 c("golden-member-search").oninput = e => {
     const q = normalizeText(e.target.value); const box = c("golden-suggestions");
     if(!q){ box.classList.add("hidden"); return; }
@@ -475,52 +480,40 @@ c("golden-member-search").oninput = e => {
     box.innerHTML = filtered.map(emp => `<div class="px-4 py-2 hover:bg-orange-50 cursor-pointer text-sm font-bold">${emp.name}</div>`).join("");
     box.classList.toggle("hidden", filtered.length === 0);
     box.querySelectorAll("div").forEach(div => {
-        div.onclick = () => {
-            selectedForGolden.push(div.textContent);
-            renderGoldenTags();
-            c("golden-member-search").value = ""; box.classList.add("hidden");
-        }
+        div.onclick = () => { selectedForGolden.push(div.textContent); renderGoldenTags(); c("golden-member-search").value = ""; box.classList.add("hidden"); }
     });
 };
-
 function renderGoldenTags(){
     const list = c("selected-golden-list");
     if(selectedForGolden.length === 0){ list.innerHTML = `<span class="text-xs text-slate-400 italic p-1">Mặc định: Toàn bộ K36</span>`; return; }
-    list.innerHTML = selectedForGolden.map((name, idx) => `<span class="member-tag">${name}<span onclick="removeGoldenMember(${idx})">✕</span></span>`).join("");
+    list.innerHTML = selectedForGolden.map((name, idx) => `<span class="member-tag">${name}<span onclick="selectedForGolden.splice(${idx},1);renderGoldenTags();">✕</span></span>`).join("");
 }
-
-function removeGoldenMember(idx){ selectedForGolden.splice(idx, 1); renderGoldenTags(); }
-
 c("btn-find-best-weekly").onclick = () => {
     let targetData = (selectedForGolden.length > 0) ? employeeData.filter(e => selectedForGolden.includes(e.name)) : employeeData.filter(e => [...team7c, ...teamPR].some(name => normalizeText(name) === normalizeText(e.name)));
-    if (targetData.length === 0) return showToast("⚠️ Không có dữ liệu để quét!");
-    
+    if (targetData.length === 0) return showToast("⚠️ Không có dữ liệu!");
     const windowSize = parseFloat(c("golden-hours-input").value) || 4;
     let finalWeeklyResults = [];
-    
     daysOrder.forEach((dayKey, dayIdx) => {
         let bestSlot = { count: -1, start: 0, end: 0, names: [] };
         for (let start = 6; start <= 24 - windowSize; start += 0.5) {
             let end = start + windowSize; let freeNames = [];
             targetData.forEach(emp => {
-                let busy = false;
-                (emp[dayKey.toLowerCase()] || "").split(";").forEach(p => { const r = parseShift(p); if (r.dur > 0 && Math.max(start, r.start) < Math.min(end, r.end)) busy = true; });
+                let busy = false; (emp[dayKey.toLowerCase()] || "").split(";").forEach(p => { const r = parseShift(p); if (r.dur > 0 && Math.max(start, r.start) < Math.min(end, r.end)) busy = true; });
                 if (!busy) freeNames.push(emp.name);
             });
             if (freeNames.length > bestSlot.count) { bestSlot = { day: days[dayIdx], count: freeNames.length, start, end, names: freeNames }; }
         }
         finalWeeklyResults.push(bestSlot);
     });
-    
     const resDiv = c("best-weekly-result"); resDiv.classList.remove("hidden");
-    resDiv.innerHTML = `<h4 class="font-bold text-slate-700 text-xs uppercase mb-2 text-center">⭐ Kết quả khoảng rảnh ${windowSize}h ⭐</h4>`;
+    resDiv.innerHTML = `<h4 class="font-bold text-slate-700 text-xs uppercase mb-2 text-center">⭐ Khoảng rảnh ${windowSize}h tốt nhất ⭐</h4>`;
     finalWeeklyResults.forEach(res => {
-        resDiv.innerHTML += `<div class="p-3 bg-white rounded-xl border border-orange-200 shadow-sm mb-2"><div class="flex justify-between items-center mb-1"><span class="font-black text-slate-700 text-sm">${res.day}</span><span class="bg-orange-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">${res.count} người rảnh</span></div><div class="text-base font-extrabold text-orange-600">⏰ ${fmtHoursToHHMM(res.start)} - ${fmtHoursToHHMM(res.end)}</div><div class="text-[10px] text-slate-400 mt-1 italic leading-tight">${res.names.join(", ")}</div></div>`;
+        resDiv.innerHTML += `<div class="p-3 bg-white rounded-xl border border-orange-200 shadow-sm mb-2"><div class="flex justify-between items-center mb-1"><span class="font-black text-slate-700 text-sm">${res.day}</span><span class="bg-orange-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">${res.count} rảnh</span></div><div class="text-base font-extrabold text-orange-600">⏰ ${fmtHoursToHHMM(res.start)} - ${fmtHoursToHHMM(res.end)}</div><div class="text-[10px] text-slate-400 mt-1 italic">${res.names.join(", ")}</div></div>`;
     });
     resDiv.scrollIntoView({ behavior: 'smooth' });
 };
 
-// --- LOGIC TÌM NGƯỜI LÀM HỘ (ĐÃ CẬP NHẬT) ---
+// --- TÌM NGƯỜI LÀM HỘ ---
 c("help-member-search").oninput = e => {
     const q = normalizeText(e.target.value); const box = c("help-suggestions");
     if(!q){ box.classList.add("hidden"); return; }
@@ -528,39 +521,19 @@ c("help-member-search").oninput = e => {
     box.innerHTML = filtered.map(emp => `<div class="px-4 py-2 hover:bg-emerald-50 cursor-pointer text-sm font-bold">${emp.name}</div>`).join("");
     box.classList.toggle("hidden", filtered.length === 0);
     box.querySelectorAll("div").forEach(div => {
-        div.onclick = () => {
-            selectedForHelp.push(div.textContent);
-            renderHelpTags();
-            c("help-member-search").value = ""; box.classList.add("hidden");
-        }
+        div.onclick = () => { selectedForHelp.push(div.textContent); renderHelpTags(); c("help-member-search").value = ""; box.classList.add("hidden"); }
     });
 };
-
 function renderHelpTags(){
     const list = c("selected-help-list");
     if(selectedForHelp.length === 0){ list.innerHTML = `<span class="text-xs text-slate-400 italic p-1">Mặc định: Toàn hệ thống</span>`; return; }
-    list.innerHTML = selectedForHelp.map((name, idx) => `<span class="member-tag help-tag">${name}<span onclick="removeHelpMember(${idx})">✕</span></span>`).join("");
+    list.innerHTML = selectedForHelp.map((name, idx) => `<span class="member-tag help-tag">${name}<span onclick="selectedForHelp.splice(${idx},1);renderHelpTags();">✕</span></span>`).join("");
 }
-
-function removeHelpMember(idx){ selectedForHelp.splice(idx, 1); renderHelpTags(); }
-
-c("btn-find-all").onclick = () => checkHelp('ALL');
-c("btn-find-k36").onclick = () => checkHelp('K36');
-
 function checkHelp(mode){
     const sH=parseFloat(c('help-start-time').value), eH=parseFloat(c('help-end-time').value), sD=c('help-start-day').value, eD=c('help-end-day').value;
     if(isNaN(sH)||isNaN(eH)) return showToast("⚠️ Nhập giờ!");
     const absS=dayMap[sD]*24+sH, absE=dayMap[eD]*24+eH;
-    
-    let list;
-    if(selectedForHelp.length > 0) {
-        // Nếu có tích chọn người, chỉ lọc trong danh sách đó
-        list = employeeData.filter(e => selectedForHelp.includes(e.name));
-    } else {
-        // Nếu không chọn ai, lọc theo chế độ ALL hoặc K36
-        list = (mode==='ALL'?employeeData:employeeData.filter(e=>[...team7c,...teamPR].some(tn=>normalizeText(tn)===normalizeText(e.name))));
-    }
-    
+    let list = (selectedForHelp.length > 0) ? employeeData.filter(e => selectedForHelp.includes(e.name)) : (mode==='ALL'?employeeData:employeeData.filter(e=>[...team7c,...teamPR].some(tn=>normalizeText(tn)===normalizeText(e.name))));
     let free=[];
     list.forEach(e=>{
         let busy=false;
@@ -572,8 +545,63 @@ function checkHelp(mode){
     c('help-list').innerHTML = free.length ? free.map(n=>`<li class="bg-emerald-50 text-emerald-800 p-2 rounded border border-emerald-100">🟢 ${n}</li>`).join("") : "<li>Không có ai rảnh</li>";
     c('help-result').classList.remove("hidden");
 }
+c("btn-find-all").onclick = () => checkHelp('ALL');
+c("btn-find-k36").onclick = () => checkHelp('K36');
 
-// --- CÁC HÀM PHỤ TRỢ ---
+// --- ADMIN: UP FILE EXCEL ---
+c("secret-admin-trigger").onclick = () => c("excel-upload").click();
+c("excel-upload").onchange = (e) => {
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+        const data = evt.target.result;
+        const workbook = XLSX.read(data, {type: 'binary'});
+        const weekName = file.name.split('.')[0].toUpperCase();
+        const employees = []; const flights = [];
+        
+        workbook.SheetNames.forEach(sheetName => {
+            if(!daysOrder.includes(sheetName)) return;
+            const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header:1});
+            const headers = sheet[0];
+            const nameIdx = headers.findIndex(h => normalizeText(h).includes("NAME"));
+            const taskIdx = headers.findIndex(h => normalizeText(h).includes("TASK"));
+            const fltIdx = headers.findIndex(h => normalizeText(h).includes("FLT"));
+            const etdIdx = headers.findIndex(h => normalizeText(h).includes("ETD"));
+            
+            sheet.slice(1).forEach(row => {
+                if(!row[nameIdx]) return;
+                const name = row[nameIdx].toString().trim();
+                const task = row[taskIdx] ? row[taskIdx].toString().trim() : "...";
+                const flt = row[fltIdx] ? row[fltIdx].toString().trim() : "...";
+                const etd = row[etdIdx] ? row[etdIdx].toString().trim() : "...";
+                
+                flights.push({ sheet: sheetName, nameOnly: name, nameNormalized: normalizeText(name), task, flt, etd });
+                
+                let emp = employees.find(e => e.name === name);
+                if(!emp){ emp = { name, nameNormalized: normalizeText(name) }; employees.push(emp); }
+                const shiftColIdx = headers.findIndex(h => normalizeText(h).includes("SHIFT"));
+                if(shiftColIdx !== -1 && row[shiftColIdx]){
+                    const shiftVal = row[shiftColIdx].toString().trim();
+                    emp[sheetName.toLowerCase()] = emp[sheetName.toLowerCase()] ? emp[sheetName.toLowerCase()] + ";" + shiftVal : shiftVal;
+                }
+            });
+        });
+        
+        if(employees.length > 0){
+            db.ref("hgs_weeks/" + weekName).set({ employees, flights })
+            .then(() => { showToast("✅ Đã tải lên thành công!"); location.reload(); })
+            .catch(err => alert("Lỗi: " + err.message));
+        }
+    };
+    reader.readAsBinaryString(file);
+};
+
+c("btn-delete-week").onclick = () => {
+    const w = c("week-select").value;
+    if(w && confirm(`Xác nhận xoá tuần ${w}?`)) db.ref("hgs_weeks/" + w).remove();
+};
+
+// --- KHỞI TẠO ---
 function createInputs(){
     const box = c("days-container"); box.innerHTML = "";
     days.forEach((d,i)=>{
@@ -583,7 +611,6 @@ function createInputs(){
     const opts = days.map((d,i)=>`<option value="${daysOrder[i].toLowerCase()}">${d}</option>`).join("");
     c('help-start-day').innerHTML = opts; c('help-end-day').innerHTML = opts;
 }
-
 function showToast(m){ const t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
 document.addEventListener("DOMContentLoaded",()=> createInputs());
 </script>
