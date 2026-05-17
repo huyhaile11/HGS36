@@ -288,11 +288,30 @@
         <div id="golden-selection-summary" class="selection-summary">Đã chọn: 0 người</div>
       </div>
 
+      <button id="btn-select-k36" type="button" class="btn-action bg-orange-100 text-orange-700 border border-orange-200 font-bold py-2.5 rounded-xl text-xs w-full hover:bg-orange-200 transition-colors text-center">
+        👥 Chọn nhanh nhóm K36
+      </button>
+
       <button id="btn-find-best-weekly" class="btn-action bg-orange-600 text-white font-bold py-3 rounded-xl shadow-md w-full text-base">
         🔥 Xem giờ rảnh nhất nhóm này
       </button>
       
       <div id="best-weekly-result" class="hidden space-y-3"></div>
+    </div>
+
+    <div class="glass-card p-5 space-y-3 border-t-4 border-t-slate-400 bg-slate-50/50 text-xs text-slate-600">
+      <div class="font-bold text-sm text-slate-700 flex items-center gap-2">📌 PHỤ LỤC TIỆN ÍCH</div>
+      <ul class="space-y-2 font-semibold">
+        <li class="flex items-center gap-2">
+          🌐 <a href="https://huyhaile11.github.io/country-codes/" target="_blank" class="text-blue-600 hover:underline">Tra code các nước</a>
+        </li>
+        <li class="flex items-center gap-2">
+          ✈️ <a href="https://huyhaile11.github.io/JejuAir/" target="_blank" class="text-blue-600 hover:underline">Chính sách hãng 7C</a>
+        </li>
+        <li class="flex items-center gap-2">
+          👶 <a href="https://huyhaile11.github.io/TinhTuoi/" target="_blank" class="text-blue-600 hover:underline">Tính tuổi CHD, Tuần thai</a>
+        </li>
+      </ul>
     </div>
 
     <div id="secret-admin-trigger"></div>
@@ -694,6 +713,19 @@ c("btn-find-help").onclick = () => {
     });
     c('help-list').innerHTML = html;
     c('help-result').classList.remove("hidden");
+};
+
+c("btn-select-k36").onclick = () => {
+    selectedGoldenNames.clear();
+    const k36 = ["HẢI 9", "KHẢI 2", "THU 9", "LY 5", "HẰNG 14", "LẬP 2", "HUY 12", "KHÁNH 2", "SƠN 12", "NGHĨA 1", "TRÂM 3", "HOÀNG 10", "LY 2"];
+    employeeData.forEach(e => {
+        if (k36.includes(e.name.toUpperCase())) {
+            selectedGoldenNames.add(e.name);
+        }
+    });
+    c("golden-selection-summary").textContent = `Đã chọn: ${selectedGoldenNames.size} người`;
+    renderDropdown('golden', c("golden-search-input").value);
+    showToast("👥 Đã tích chọn nhóm K36!");
 };
 
 c("btn-find-best-weekly").onclick = () => {
