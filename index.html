@@ -425,7 +425,7 @@ function processAndUpload(data){
         if(row[1]) allEmp.push({
             name: String(row[1]).trim(),
             mon: (row[2]||"")+(row[4]?';'+row[4]:""), tue: (row[5]||"")+(row[7]?';'+row[7]:""),
-            wed: (row[8]||"")+(row[10]?';'+row[10]:""), thu: (row[11]||"")+(row[13]?';'+row[11]:""),
+            wed: (row[8]||"")+(row[10]?';'+row[10]:""), thu: (row[11]||"")+(row[13]?';'+row[13]:""),
             fri: (row[14]||"")+(row[16]?';'+row[16]:""), sat: (row[17]||"")+(row[19]?';'+row[19]:""),
             sun: (row[20]||"")+(row[22]?';'+row[22]:"")
         });
