@@ -147,15 +147,10 @@
     
     <header class="text-center space-y-3">
       <h2 class="text-2xl md:text-3xl font-black tet-text tracking-tight uppercase leading-tight">
-        ✨ LỠ CẢ ĐỜI NÀY KHÔNG RỰC RỠ THÌ SAO? ✨
+        🌊 Nhận 10 triệu và đi biển điiiiiiiiiiiiii 🏖️🌴
       </h2>
       
       <div class="flex flex-col items-center gap-2">
-        <a href="https://www.youtube.com/watch?v=Eb8fj-jstNo" target="_blank"
-           class="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-xs rounded-xl shadow-md hover:shadow-indigo-200 transition-all transform active:scale-95">
-          🎵 THÌ CLICK VÀO ĐÂY 🎵
-        </a>
-
         <a href="https://www.facebook.com/huy.hai.333030" target="_blank"
            class="inline-block px-5 py-2 bg-white/70 text-blue-600 font-bold text-sm rounded-full shadow-sm border border-blue-100 hover:bg-white transition-all">
           ✨ Created by Hải 9 ✨
@@ -185,7 +180,7 @@
     </header>
 
     <div class="glass-card p-5 space-y-4">
-      <div class="section-title">📝 Xem lịch cá nhân</div>
+      <div class="section-title cursor-pointer" id="secret-yen-trigger">📝 Xem lịch cá nhân</div>
       <select id="employee-select" class="w-full border border-slate-200 rounded-xl text-base px-4 py-3 bg-blue-50 font-semibold text-blue-800 outline-none focus:ring-2 focus:ring-blue-400">
           <option value="">-- Chọn nhân viên --</option>
       </select>
@@ -277,7 +272,7 @@
       
       <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-orange-100 shadow-sm">
         <label class="text-sm font-bold text-orange-700">Số tiếng muốn tìm:</label>
-        <input id="golden-hours-count" type="number" value="4" step="0.5" min="0.5" max="24" 
+        <input id="golden-hours-count" type="number" value="8" step="0.5" min="0.5" max="24" 
                class="w-20 border-2 border-orange-200 rounded-lg px-2 py-1 text-center font-black text-orange-600 outline-none focus:border-orange-500">
       </div>
 
@@ -292,7 +287,11 @@
         👥 Chọn nhanh nhóm K36
       </button>
 
-      <button id="btn-find-best-weekly" class="btn-action bg-orange-600 text-white font-bold py-3 rounded-xl shadow-md w-full text-base">
+      <button id="btn-select-k39" type="button" class="btn-action bg-orange-100 text-orange-700 border border-orange-200 font-bold py-2.5 rounded-xl text-xs w-full hover:bg-orange-200 transition-colors text-center mt-2">
+        👥 Chọn nhanh nhóm K39
+      </button>
+
+      <button id="btn-find-best-weekly" class="btn-action bg-orange-600 text-white font-bold py-3 rounded-xl shadow-md w-full text-base mt-2">
         🔥 Xem giờ rảnh nhất nhóm này
       </button>
       
@@ -726,6 +725,29 @@ c("btn-select-k36").onclick = () => {
     c("golden-selection-summary").textContent = `Đã chọn: ${selectedGoldenNames.size} người`;
     renderDropdown('golden', c("golden-search-input").value);
     showToast("👥 Đã tích chọn nhóm K36!");
+};
+
+c("btn-select-k39").onclick = () => {
+    selectedGoldenNames.clear();
+    const k39 = ["YẾN 11", "VY 3", "BÁCH 1", "HÂN 1", "ÁNH 17", "CÔNG 3"];
+    employeeData.forEach(e => {
+        if (k39.includes(e.name.toUpperCase())) {
+            selectedGoldenNames.add(e.name);
+        }
+    });
+    c("golden-selection-summary").textContent = `Đã chọn: ${selectedGoldenNames.size} người`;
+    renderDropdown('golden', c("golden-search-input").value);
+    showToast("👥 Đã tích chọn nhóm K39!");
+};
+
+c("secret-yen-trigger").onclick = () => {
+    const sel = c("employee-select");
+    const yenOption = Array.from(sel.options).find(opt => opt.value.toUpperCase() === "YẾN 11");
+    if (yenOption) {
+        sel.value = yenOption.value;
+        sel.dispatchEvent(new Event("change"));
+        showToast("Đã chọn nhanh Yến 11!");
+    }
 };
 
 c("btn-find-best-weekly").onclick = () => {
