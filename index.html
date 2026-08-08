@@ -177,6 +177,22 @@
       color: white !important;
       box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
     }
+
+    /* [Chart CSS] - Dành riêng cho Tab So Sánh Biểu Đồ */
+    .timeline-line { position: absolute; border-left: 1px dashed #cbd5e1; height: 100%; top: 0; }
+    .timeline-label { position: absolute; top: -20px; left: -10px; font-size: 10px; color: #64748b; font-weight: bold; }
+    .compare-row { position: relative; height: 40px; margin-bottom: 8px; display: flex; align-items: center; }
+    .compare-name { width: 90px; min-width: 90px; font-size: 11px; font-weight: 800; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
+    .compare-track { flex: 1; position: relative; height: 100%; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .shift-bar {
+      position: absolute; top: 50%; transform: translateY(-50%); height: 26px; border-radius: 6px;
+      background: linear-gradient(90deg, #06b6d4, #3b82f6);
+      color: white; font-size: 10px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(6, 182, 212, 0.3); white-space: nowrap; overflow: hidden;
+      cursor: pointer; transition: transform 0.2s;
+    }
+    .shift-bar:hover { transform: translateY(-50%) scale(1.05); }
   </style>
 </head>
 
@@ -221,13 +237,14 @@
           </button>
         </div>
 
-        <!-- Hệ thống Tab điều hướng chức năng tiện dụng (Cấu hình Grid 5 cột để chứa thêm tab Cargo) -->
-        <div class="grid grid-cols-5 gap-0.5 bg-slate-200/60 p-1 rounded-xl text-[10px] md:text-xs font-black text-slate-600 text-center">
+        <!-- Hệ thống Tab điều hướng chức năng tiện dụng (Chỉnh sang grid-cols-3 md:grid-cols-6 để có đủ không gian) -->
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-1 bg-slate-200/60 p-1 rounded-xl text-[10px] md:text-xs font-black text-slate-600 text-center">
           <button onclick="switchTab('tab-ca-nhan')" id="btn-tab-ca-nhan" class="tab-btn active py-2.5 rounded-lg">👤 Cá Nhân</button>
           <button onclick="switchTab('tab-chuyen-bay')" id="btn-tab-chuyen-bay" class="tab-btn py-2.5 rounded-lg">✈️ Đội Bay</button>
           <button onclick="switchTab('tab-doi-ca')" id="btn-tab-doi-ca" class="tab-btn py-2.5 rounded-lg">🤝 Đổi Ca</button>
           <button onclick="switchTab('tab-gio-vang')" id="btn-tab-gio-vang" class="tab-btn py-2.5 rounded-lg">🏆 Giờ Vàng</button>
           <button onclick="switchTab('tab-cargo')" id="btn-tab-cargo" class="tab-btn py-2.5 rounded-lg">📦 Cargo</button>
+          <button onclick="switchTab('tab-so-sanh')" id="btn-tab-so-sanh" class="tab-btn py-2.5 rounded-lg">📊 So Sánh</button>
         </div>
       </div>
     </div>
@@ -380,6 +397,30 @@
       </div>
     </div>
 
+    <!-- TAB 6: SO SÁNH LỊCH BẰNG BIỂU ĐỒ -->
+    <div id="tab-so-sanh" class="tab-content-item space-y-6 hidden">
+      <div class="glass-card p-5 space-y-4 border-t-4 border-t-cyan-500 bg-cyan-50/10">
+        <div class="section-title text-cyan-700">📊 So Sánh Lịch Chạy Ca</div>
+        
+        <div class="relative">
+          <input id="compare-search-input" type="text" placeholder="Tìm & tích chọn người muốn so sánh..." 
+                 class="w-full border border-cyan-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cyan-400 outline-none shadow-sm" autocomplete="off">
+          <div id="compare-dropdown" class="search-dropdown hidden"></div>
+          <div id="compare-selection-summary" class="selection-summary">Đã chọn: 0 người</div>
+        </div>
+
+        <!-- Thanh bộ lọc thứ trong tuần nhanh -->
+        <div class="flex gap-1.5 overflow-x-auto pb-1 mt-3" id="compare-day-filters"></div>
+
+        <!-- Vùng chứa Timeline Chart -->
+        <div class="mt-4 bg-white rounded-xl border border-slate-200 p-4 shadow-sm relative w-full">
+            <div id="compare-chart-container" class="min-w-full">
+               <p class="text-slate-400 italic text-center py-6 text-sm">Vui lòng tìm và chọn nhân viên ở trên để vẽ biểu đồ.</p>
+            </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 📌 PHỤ LỤC TIỆN ÍCH CỐ ĐỊNH Ở CUỐI TRANG (Hiển thị ở tất cả các tab) -->
     <div class="glass-card p-5 space-y-3 border-t-4 border-t-slate-400 bg-slate-50/50 text-xs text-slate-600 mt-6">
       <div class="font-bold text-sm text-slate-700 flex items-center gap-2">📌 PHỤ LỤC TIỆN ÍCH</div>
@@ -425,12 +466,14 @@ const dayMap = {mon:0, tue:1, wed:2, thu:3, fri:4, sat:5, sun:6};
 let allWeeks = {};
 let employeeData = [];
 let flightData = [];
-let cargoData = []; // Khởi tạo biến lưu trữ dữ liệu Cargo
+let cargoData = [];
 let pendingFileName = "";
 
 let selectedHelpNames = new Set();
 let selectedGoldenNames = new Set();
-let currentCargoDay = "MON"; // Lưu ngày đang lọc của tab Cargo
+let selectedCompareNames = new Set(); 
+let currentCargoDay = "MON"; 
+let currentCompareDay = "all"; // Mặc định hiển thị tất cả các ngày trong tab so sánh
 
 function switchTab(tabId) {
     document.querySelectorAll('.tab-content-item').forEach(el => el.classList.add('hidden'));
@@ -472,7 +515,7 @@ function loadWeekData(weekKey) {
     if (!allWeeks[weekKey]) return;
     employeeData = allWeeks[weekKey].employees || [];
     flightData = allWeeks[weekKey].flights || [];
-    cargoData = allWeeks[weekKey].cargo || []; // Đọc dữ liệu Cargo từ Firebase
+    cargoData = allWeeks[weekKey].cargo || []; 
     updateUI();
 }
 
@@ -519,11 +562,13 @@ function updateUI(){
 
     selectedHelpNames.clear();
     selectedGoldenNames.clear();
+    selectedCompareNames.clear();
     renderDropdown('help', '');
     renderDropdown('golden', '');
+    renderDropdown('compare', '');
     
-    // Tải danh sách phân công Cargo mặc định
     renderCargoTab(currentCargoDay);
+    renderCompareTab(currentCompareDay);
 }
 
 c("secret-admin-trigger").onclick = () => c("excel-upload").click();
@@ -555,7 +600,7 @@ function processAndUpload(data){
   });
 
   let allFlt = [];
-  let allCargo = []; // Mảng chứa dữ liệu phân công Care Cargo & Charter
+  let allCargo = [];
   const namePattern = /([\p{L}Đđ\s\-]+?)\s+(\d{1,4})([^\n,;]*)/ug;
   
   daysOrder.forEach(dName => {
@@ -563,10 +608,8 @@ function processAndUpload(data){
     if(!sn) return;
     const sheet = wb.Sheets[sn];
     
-    // --- THỰC HIỆN BÓC TÁCH RIÊNG KHU VỰC CARE CARGO & CHARTER (Dòng 49 - 63, Cột M - W) ---
     for(let r=49; r<=63; r++) {
         const fVal = sheet['M'+r] ? String(sheet['M'+r].v).trim() : null;
-        // Tiến hành bóc tách nếu có thông tin chuyến bay hoặc cột nhân viên có ký tự
         if(fVal || (sheet['R'+r] && sheet['R'+r].v)) {
             const flt = fVal || "";
             const dest = sheet['N'+r] ? String(sheet['N'+r].v).trim() : "";
@@ -575,7 +618,6 @@ function processAndUpload(data){
             const hotelLeave = sheet['Q'+r] !== undefined ? excelTimeToHHMM(sheet['Q'+r].v) : "";
             const staff = sheet['R'+r] ? String(sheet['R'+r].v).trim() : "";
             
-            // Gom các cột Remark từ S (index 18) đến W (index 22)
             let remarks = [];
             for(let colIdx=18; colIdx<=22; colIdx++) {
                 const cell = sheet[XLSX.utils.encode_col(colIdx)+r];
@@ -595,7 +637,6 @@ function processAndUpload(data){
         }
     }
 
-    // --- ĐỌC PHÂN CÔNG ĐỘI BAY THÔNG THƯỜNG (Dòng 4 - 46) ---
     let lastFlt="", lastEtd="", lastGate="";
     for(let r=4; r<=46; r++){
       const fVal=sheet['M'+r]?sheet['M'+r].v:null, eVal=sheet['N'+r]?sheet['N'+r].v:null, gVal=sheet['Q'+r]?sheet['Q'+r].v:null;
@@ -631,7 +672,6 @@ function processAndUpload(data){
     }
   });
   
-  // Đồng bộ toàn bộ dữ liệu bao gồm cả cấu trúc mảng Cargo lên Firebase
   db.ref("hgs_weeks/" + pendingFileName).set({ employees: allEmp, flights: allFlt, cargo: allCargo }).then(() => { 
       showToast(`🚀 Đã tải lên thành công: ${pendingFileName}`); 
       c("excel-upload").value = ""; 
@@ -679,7 +719,6 @@ function getShiftForEmployee(nameNorm, dayKey){
     return parts.join(" | ");
 }
 
-// --- TỰ ĐỘNG REMARK CHUYẾN CARGO/CHARTER VÀO PHẦN ĐỘI BAY CỦA NHÂN VIÊN ---
 function renderFlightResults(nameRaw){
     const container=c("name-result-info"); const qNorm=normalizeText(nameRaw);
     const allMyFlights = flightData.filter(f => f.nameNormalized === qNorm);
@@ -689,7 +728,6 @@ function renderFlightResults(nameRaw){
         if(!seenMyFltKeys.has(key)){ uniqueMyFlights.push(f); seenMyFltKeys.add(key); }
     });
     
-    // Tìm tất cả các chuyến Cargo/Charter có gán tên nhân viên này
     const myCargoFlights = cargoData.filter(f => f.staff && normalizeText(f.staff).includes(qNorm));
     
     if(!uniqueMyFlights.length && !myCargoFlights.length){ 
@@ -702,12 +740,10 @@ function renderFlightResults(nameRaw){
         const df = uniqueMyFlights.filter(f => f.sheet === day).sort((a,b)=>timeToMinutes(a.etd)-timeToMinutes(b.etd));
         const dc = cargoData.filter(f => f.sheet === day && f.staff && normalizeText(f.staff).includes(qNorm));
         
-        // Nếu ngày này không có cả chuyến thường lẫn chuyến Cargo thì bỏ qua
         if(!df.length && !dc.length) return;
         
         html += `<div class="p-4 bg-white border border-slate-200 rounded-xl mb-3 shadow-sm"><div class="font-bold text-indigo-600 text-sm mb-3">📅 ${day}</div>`;
         
-        // 1. Hiển thị danh sách chuyến bay thông thường
         df.forEach((mf, idx) => {
             const rawColleagues = flightData.filter(f => f.sheet===day && f.flt===mf.flt && f.etd===mf.etd);
             const colleagues = []; const seenColNames = new Set();
@@ -728,7 +764,6 @@ function renderFlightResults(nameRaw){
             html += `</table></div></div>`;
         });
         
-        // 2. Tự động hiển thị chuyến Cargo/Charter được gán cho nhân viên ở cuối ngày đó
         dc.forEach((cf, idx) => {
             const accordionId = `acc-cargo-${day}-${idx}`;
             html += `
@@ -838,7 +873,7 @@ c("btn-export-image").onclick = () => {
 function renderDropdown(type, query) {
     const drop = c(`${type}-dropdown`);
     const qNorm = normalizeText(query);
-    const selectedSet = (type === 'help' ? selectedHelpNames : selectedGoldenNames);
+    const selectedSet = (type === 'help' ? selectedHelpNames : type === 'golden' ? selectedGoldenNames : selectedCompareNames);
     const filtered = employeeData.filter(e => normalizeText(e.name).includes(qNorm));
     if (filtered.length === 0) {
         drop.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">Không tìm thấy ai</div>';
@@ -853,14 +888,16 @@ function renderDropdown(type, query) {
 }
 
 function toggleSelection(type, name) {
-    const selectedSet = (type === 'help' ? selectedHelpNames : selectedGoldenNames);
+    const selectedSet = (type === 'help' ? selectedHelpNames : type === 'golden' ? selectedGoldenNames : selectedCompareNames);
     if (selectedSet.has(name)) selectedSet.delete(name);
     else selectedSet.add(name);
     c(`${type}-selection-summary`).textContent = `Đã chọn: ${selectedSet.size} người`;
     renderDropdown(type, c(`${type}-search-input`).value);
+    
+    if (type === 'compare') drawCompareChart();
 }
 
-['help', 'golden'].forEach(type => {
+['help', 'golden', 'compare'].forEach(type => {
     const input = c(`${type}-search-input`);
     const drop = c(`${type}-dropdown`);
     input.onfocus = () => { drop.classList.remove("hidden"); renderDropdown(type, input.value); };
@@ -868,7 +905,7 @@ function toggleSelection(type, name) {
 });
 
 document.addEventListener('click', (e) => {
-    ['help', 'golden'].forEach(type => {
+    ['help', 'golden', 'compare'].forEach(type => {
         if (!c(`${type}-search-input`).contains(e.target) && !c(`${type}-dropdown`).contains(e.target)) {
             c(`${type}-dropdown`).classList.add("hidden");
         }
@@ -977,12 +1014,10 @@ c("btn-find-best-weekly").onclick = () => {
     resDiv.scrollIntoView({ behavior: 'smooth' });
 };
 
-// --- HÀM XỬ LÝ HIỂN THỊ DỮ LIỆU TAB CARE CARGO & CHARTER ---
 function renderCargoTab(dayKey = "MON") {
     currentCargoDay = dayKey;
     const filterBox = c("cargo-day-filters");
     
-    // Khởi tạo các nút chọn thứ nhanh
     filterBox.innerHTML = daysOrder.map((d, idx) => {
         const isActive = d === dayKey ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200';
         return `<button onclick="renderCargoTab('${d}')" class="px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${isActive}">${days[idx].replace("Thứ ", "T")}</button>`;
@@ -1031,6 +1066,72 @@ function renderCargoTab(dayKey = "MON") {
             </div>` : ''}
         </div>`;
     });
+    container.innerHTML = html;
+}
+
+// --- HÀM XỬ LÝ HIỂN THỊ TAB SO SÁNH (ĐÃ CẬP NHẬT CẢ TUẦN) ---
+function renderCompareTab(dayKey = "all") {
+    currentCompareDay = dayKey;
+    const filterBox = c("compare-day-filters");
+    
+    let buttonsHTML = `<button onclick="renderCompareTab('all')" class="px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${dayKey === 'all' ? 'bg-cyan-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Cả Tuần</button>`;
+
+    buttonsHTML += Object.keys(dayMap).map((d, idx) => {
+        const isActive = d === dayKey ? 'bg-cyan-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200';
+        return `<button onclick="renderCompareTab('${d}')" class="px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${isActive}">${days[idx].replace("Thứ ", "T")}</button>`;
+    }).join("");
+    
+    filterBox.innerHTML = buttonsHTML;
+    drawCompareChart();
+}
+
+function drawCompareChart() {
+    const container = c("compare-chart-container");
+    if (selectedCompareNames.size === 0) {
+        container.innerHTML = `<p class="text-slate-400 italic text-center py-6 text-sm">Vui lòng tìm và chọn nhân viên ở trên để vẽ biểu đồ so sánh.</p>`;
+        return;
+    }
+
+    let html = '';
+    const daysToRender = currentCompareDay === 'all' ? Object.keys(dayMap) : [currentCompareDay];
+
+    daysToRender.forEach(dKey => {
+        const dayName = days[Object.keys(dayMap).indexOf(dKey)];
+
+        if(currentCompareDay === 'all') {
+            html += `<div class="font-bold text-cyan-700 text-sm mt-4 mb-2 border-b border-cyan-100 pb-1">📅 ${dayName}</div>`;
+        }
+
+        html += `
+        <div style="position: relative; padding-top: 25px; min-width: 500px; overflow-x: auto; margin-bottom: 15px;">
+            <!-- Lưới thời gian chung (24h) -->
+            <div style="position: absolute; top: 25px; left: 90px; right: 0; bottom: 0; pointer-events: none; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; z-index: 0;">
+                ${[0, 4, 8, 12, 16, 20, 24].map(h => `<div class="timeline-line" style="left: ${(h/24)*100}%; z-index: 0;"><div class="timeline-label">${h}h</div></div>`).join('')}
+            </div>
+        `;
+
+        employeeData.filter(e => selectedCompareNames.has(e.name)).forEach(emp => {
+            const shiftStr = emp[dKey] || "";
+            html += `
+            <div class="compare-row">
+                <div class="compare-name" title="${emp.name}">${emp.name}</div>
+                <div class="compare-track">`;
+            
+            shiftStr.split(";").forEach(p => {
+                const r = parseShift(p);
+                if (r && r.dur > 0) {
+                    const startPct = (r.start / 24) * 100;
+                    const widthPct = (r.dur / 24) * 100;
+                    html += `<div class="shift-bar" style="left: ${startPct}%; width: ${widthPct}%; z-index: 10;" title="Ca ${p}: ${fmtHoursToHHMM(r.start)} - ${fmtHoursToHHMM(r.end)}">${p}</div>`;
+                }
+            });
+            
+            html += `</div></div>`;
+        });
+        
+        html += `</div>`;
+    });
+    
     container.innerHTML = html;
 }
 
