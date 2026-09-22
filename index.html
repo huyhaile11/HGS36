@@ -23,7 +23,7 @@
     html { font-size: 17px; scroll-behavior: smooth; } 
     body { 
       font-family: 'Plus Jakarta Sans', sans-serif; 
-      background: linear-gradient(135deg, #fff5f5 0%, #f0f4f8 100%); 
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); 
       color: #1e293b; 
       min-height: 100vh;
     }
@@ -67,10 +67,10 @@
     .status-offline { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
     .tet-text {
-      background: linear-gradient(to bottom, #1e293b, #334155);
+      background: linear-gradient(to bottom, #ea580c, #b91c1c);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+      text-shadow: 2px 2px 4px rgba(234, 88, 12, 0.2);
     }
 
     .arrow-icon { transition: transform 0.3s ease; }
@@ -201,13 +201,13 @@
     
     <header class="text-center space-y-3">
       <h2 class="text-2xl md:text-3xl font-black tet-text tracking-tight uppercase leading-tight">
-        🌊 Nhận 10 triệu và đi biển điiiiiiiiiiiiii 🏖️🌴
+        🌕 Trung Thu Đoàn Viên - Rước Đèn Phá Cỗ Điiiiii 🏮🥮
       </h2>
       
       <div class="flex flex-col items-center gap-2">
         <a href="https://www.facebook.com/huy.hai.333030" target="_blank"
-           class="inline-block px-5 py-2 bg-white/70 text-blue-600 font-bold text-sm rounded-full shadow-sm border border-blue-100 hover:bg-white transition-all">
-          ✨ Created by Hải 9 ✨
+           class="inline-block px-5 py-2 bg-white/70 text-orange-600 font-bold text-sm rounded-full shadow-sm border border-orange-100 hover:bg-white transition-all">
+          🐇 Created by Hải 9 🌕
         </a>
       </div>
 
@@ -216,7 +216,7 @@
         <h1 class="text-xl font-extrabold text-slate-700 block mt-1">📅 LỊCH CỐNG HIẾN HGS</h1>
         
         <a href="https://huyhaile11.github.io/banca/" target="_blank" class="btn-muaban">
-           🛒 TRAO ĐỔI CA BẤM VÀO ĐÂY 🛒
+           🏮 TRAO ĐỔI CA BẤM VÀO ĐÂY 🏮
         </a>
       </div>
     </header>
@@ -460,7 +460,7 @@ const db = firebase.database();
 const c = id => document.getElementById(id);
 const days = ["Thứ Hai","Thứ Ba","Thứ Tư","Thứ Năm","Thứ Sáu","Thứ Bảy","Chủ Nhật"];
 const daysOrder = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
-const priority = ["YẾN 11","HẢI 9", "KHẢI 2", "THU 9", "LY 5", "HẰNG 14", "LẬP 2", "HUY 12", "DŨNG 12", "HUYỀN 15", "KHÁNH 2", "SƠN 12", "NGHĨA 1", "TRÂM 3", "ANH 10", "HOÀNG 10", "HUY 11", "LY 2", "HUY 14"];
+const priority = ["HẢI 9", "KHẢI 2", "THU 9", "LY 5", "HẰNG 14", "LẬP 2", "HUY 12", "DŨNG 12", "HUYỀN 15", "KHÁNH 2", "SƠN 12", "NGHĨA 1", "TRÂM 3", "ANH 10", "HOÀNG 10", "HUY 11", "LY 2", "HUY 14"];
 const dayMap = {mon:0, tue:1, wed:2, thu:3, fri:4, sat:5, sun:6};
 
 let allWeeks = {};
