@@ -17,13 +17,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Lịch HGS">
-  <link rel="manifest" href='data:application/json,{"name":"Lịch Cống Hiến HGS","short_name":"Lịch HGS","start_url":".","display":"standalone","background_color":"#f0f4f8","theme_color":"#3b82f6"}'>
+  <link rel="manifest" href='data:application/json,{"name":"Lịch Cống Hiến HGS","short_name":"Lịch HGS","start_url":".","display":"standalone","background_color":"#f0f4f8","theme_color":"#f43f5e"}'>
 
   <style>
     html { font-size: 17px; scroll-behavior: smooth; } 
     body { 
       font-family: 'Plus Jakarta Sans', sans-serif; 
-      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); 
+      background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); 
       color: #1e293b; 
       min-height: 100vh;
     }
@@ -36,7 +36,7 @@
     }
     .section-title {
       display: flex; align-items: center; gap: 8px; font-weight: 700; color: #334155;
-      margin-bottom: 1rem; border-left: 4px solid #3b82f6; padding-left: 12px;
+      margin-bottom: 1rem; border-left: 4px solid #f43f5e; padding-left: 12px;
     }
     .btn-action { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
     .btn-action:active { transform: scale(0.97); }
@@ -53,7 +53,7 @@
     }
     
     .day-container { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; transition: all 0.2s; }
-    .day-container:focus-within { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    .day-container:focus-within { border-color: #f43f5e; box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1); }
     .day-even { background: #ffffff; }
     .day-odd { background: #f8fafc; }
 
@@ -67,10 +67,10 @@
     .status-offline { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
     .tet-text {
-      background: linear-gradient(to bottom, #ea580c, #b91c1c);
+      background: linear-gradient(to bottom, #e11d48, #be123c);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 2px 2px 4px rgba(234, 88, 12, 0.2);
+      text-shadow: 2px 2px 4px rgba(225, 29, 72, 0.2);
     }
 
     .arrow-icon { transition: transform 0.3s ease; }
@@ -91,13 +91,13 @@
     }
 
     @keyframes pulse-red {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-      70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
+      70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
     }
     .btn-muaban {
       animation: pulse-red 2s infinite;
-      background: linear-gradient(90deg, #ef4444, #f59e0b);
+      background: linear-gradient(90deg, #f43f5e, #fb7185);
       display: block;
       width: 100%;
       padding: 14px;
@@ -106,7 +106,7 @@
       font-weight: 900;
       text-align: center;
       margin-top: 15px;
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
       text-decoration: none;
       transition: all 0.3s;
     }
@@ -151,12 +151,12 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(240, 244, 248, 0.96);
+      background: rgba(255, 241, 242, 0.96);
       backdrop-filter: blur(12px);
       padding-top: 10px;
       padding-bottom: 10px;
       margin-bottom: 16px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      border-bottom: 1px solid rgba(254, 205, 211, 0.8);
     }
     
     /* [Ca Gãy] Định dạng màu sắc trực quan làm nổi bật hàng bị gãy ca */
@@ -173,9 +173,9 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tab-btn.active {
-      background-color: #3b82f6 !important;
+      background-color: #f43f5e !important;
       color: white !important;
-      box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+      box-shadow: 0 4px 6px -1px rgba(244, 63, 94, 0.2);
     }
 
     /* [Chart CSS] - Dành riêng cho Tab So Sánh Biểu Đồ */
@@ -186,10 +186,10 @@
     .compare-track { flex: 1; position: relative; height: 100%; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
     .shift-bar {
       position: absolute; top: 50%; transform: translateY(-50%); height: 26px; border-radius: 6px;
-      background: linear-gradient(90deg, #06b6d4, #3b82f6);
+      background: linear-gradient(90deg, #fb7185, #f43f5e);
       color: white; font-size: 10px; font-weight: 800;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 6px rgba(6, 182, 212, 0.3); white-space: nowrap; overflow: hidden;
+      box-shadow: 0 2px 6px rgba(244, 63, 94, 0.3); white-space: nowrap; overflow: hidden;
       cursor: pointer; transition: transform 0.2s;
     }
     .shift-bar:hover { transform: translateY(-50%) scale(1.05); }
@@ -201,13 +201,13 @@
     
     <header class="text-center space-y-3">
       <h2 class="text-2xl md:text-3xl font-black tet-text tracking-tight uppercase leading-tight">
-        🌕 Trung Thu Đoàn Viên - Rước Đèn Phá Cỗ Điiiiii 🏮🥮
+        🌸 Chào Mừng Ngày 20/10 - Tôn Vinh Một Nửa Thế Giới 💐✨
       </h2>
       
       <div class="flex flex-col items-center gap-2">
         <a href="https://www.facebook.com/huy.hai.333030" target="_blank"
-           class="inline-block px-5 py-2 bg-white/70 text-orange-600 font-bold text-sm rounded-full shadow-sm border border-orange-100 hover:bg-white transition-all">
-          🐇 Created by Hải 9 🌕
+           class="inline-block px-5 py-2 bg-white/70 text-rose-600 font-bold text-sm rounded-full shadow-sm border border-rose-100 hover:bg-white transition-all">
+          🌸 Created by Hải 9 💐
         </a>
       </div>
 
@@ -216,7 +216,7 @@
         <h1 class="text-xl font-extrabold text-slate-700 block mt-1">📅 LỊCH CỐNG HIẾN HGS</h1>
         
         <a href="https://huyhaile11.github.io/banca/" target="_blank" class="btn-muaban">
-           🏮 TRAO ĐỔI CA BẤM VÀO ĐÂY 🏮
+           💌 TRAO ĐỔI CA BẤM VÀO ĐÂY 💌
         </a>
       </div>
     </header>
@@ -228,7 +228,7 @@
         <div class="px-2 flex gap-2 items-end">
           <div class="flex-1 text-left">
             <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Chọn tuần làm việc:</label>
-            <select id="week-select" class="w-full border-2 border-blue-100 rounded-xl px-4 py-2.5 bg-white font-bold text-blue-800 shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
+            <select id="week-select" class="w-full border-2 border-rose-100 rounded-xl px-4 py-2.5 bg-white font-bold text-rose-800 shadow-sm outline-none focus:ring-2 focus:ring-rose-400">
                 <option value="">-- Đang tải dữ liệu... --</option>
             </select>
           </div>
@@ -255,12 +255,12 @@
     <div id="tab-ca-nhan" class="tab-content-item space-y-6">
       <div class="glass-card p-5 space-y-4">
         <div class="section-title cursor-pointer" id="secret-yen-trigger">📝 Xem lịch cá nhân</div>
-        <select id="employee-select" class="w-full border border-slate-200 rounded-xl text-base px-4 py-3 bg-blue-50 font-semibold text-blue-800 outline-none focus:ring-2 focus:ring-blue-400">
+        <select id="employee-select" class="w-full border border-slate-200 rounded-xl text-base px-4 py-3 bg-rose-50 font-semibold text-rose-800 outline-none focus:ring-2 focus:ring-rose-400">
             <option value="">-- Chọn nhân viên --</option>
         </select>
         <div id="days-container" class="grid grid-cols-1 gap-2.5"></div>
         <div class="grid grid-cols-2 gap-3 pt-2">
-          <button id="calc-week" class="btn-action bg-blue-600 text-white rounded-xl py-4 font-bold shadow-md hover:bg-blue-700">📅 Tính giờ tuần</button>
+          <button id="calc-week" class="btn-action bg-rose-600 text-white rounded-xl py-4 font-bold shadow-md hover:bg-rose-700">📅 Tính giờ tuần</button>
           <button id="clear-week" class="btn-action bg-slate-400 text-white rounded-xl py-4 font-bold shadow-md hover:bg-slate-500">🧹 Xóa trắng</button>
         </div>
       </div>
@@ -294,16 +294,16 @@
 
     <!-- TAB 2: CHUYỂN BAY & ĐỒNG ĐỘI -->
     <div id="tab-chuyen-bay" class="tab-content-item space-y-6 hidden">
-      <div class="glass-card p-5 space-y-4 border-t-4 border-t-indigo-500">
+      <div class="glass-card p-5 space-y-4 border-t-4 border-t-rose-500">
         <div class="section-title">🔍 Chuyến bay & Đồng đội</div>
         <div class="grid grid-cols-1 gap-3">
           <div class="relative">
             <input id="search-name" type="text" placeholder="Tìm tên nhân viên..."
-                   class="w-full border border-slate-200 rounded-xl px-4 py-3 pl-10 text-base focus:ring-2 focus:ring-indigo-400 outline-none shadow-sm" autocomplete="off">
+                   class="w-full border border-slate-200 rounded-xl px-4 py-3 pl-10 text-base focus:ring-2 focus:ring-rose-400 outline-none shadow-sm" autocomplete="off">
             <span class="absolute left-3 top-4 opacity-40">👤</span>
             <div id="suggestions" class="absolute w-full bg-white border border-slate-200 rounded-xl shadow-xl mt-1 hidden z-50 max-h-60 overflow-y-auto"></div>
           </div>
-          <select id="flight-select-dropdown" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base bg-indigo-50 font-medium text-indigo-900 outline-none focus:ring-2 focus:ring-indigo-400">
+          <select id="flight-select-dropdown" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base bg-rose-50 font-medium text-rose-900 outline-none focus:ring-2 focus:ring-rose-400">
             <option value="">-- Hoặc chọn theo chuyến bay --</option>
           </select>
         </div>
@@ -350,31 +350,31 @@
 
     <!-- TAB 4: GIỜ VÀNG ĐỒNG ĐỘI -->
     <div id="tab-gio-vang" class="tab-content-item space-y-6 hidden">
-      <div class="glass-card p-5 space-y-4 border-t-4 border-t-orange-500 bg-orange-50/20">
-        <div class="section-title text-orange-700">🏆 "Giờ Vàng" Theo Ngày</div>
+      <div class="glass-card p-5 space-y-4 border-t-4 border-t-amber-500 bg-amber-50/20">
+        <div class="section-title text-amber-700">🏆 "Giờ Vàng" Theo Ngày</div>
         
-        <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-orange-100 shadow-sm">
-          <label class="text-sm font-bold text-orange-700">Số tiếng muốn tìm:</label>
+        <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-amber-100 shadow-sm">
+          <label class="text-sm font-bold text-amber-700">Số tiếng muốn tìm:</label>
           <input id="golden-hours-count" type="number" value="8" step="0.5" min="0.5" max="24" 
-                 class="w-20 border-2 border-orange-200 rounded-lg px-2 py-1 text-center font-black text-orange-600 outline-none focus:border-orange-500">
+                 class="w-20 border-2 border-amber-200 rounded-lg px-2 py-1 text-center font-black text-amber-600 outline-none focus:border-amber-500">
         </div>
 
         <div class="relative">
           <input id="golden-search-input" type="text" placeholder="Tìm & tích chọn người muốn tìm giờ vàng..." 
-                 class="w-full border border-orange-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-400 outline-none shadow-sm" autocomplete="off">
+                 class="w-full border border-amber-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-amber-400 outline-none shadow-sm" autocomplete="off">
           <div id="golden-dropdown" class="search-dropdown hidden"></div>
           <div id="golden-selection-summary" class="selection-summary">Đã chọn: 0 người</div>
         </div>
 
-        <button id="btn-select-k36" type="button" class="btn-action bg-orange-100 text-orange-700 border border-orange-200 font-bold py-2.5 rounded-xl text-xs w-full hover:bg-orange-200 transition-colors text-center">
+        <button id="btn-select-k36" type="button" class="btn-action bg-amber-100 text-amber-700 border border-amber-200 font-bold py-2.5 rounded-xl text-xs w-full hover:bg-amber-200 transition-colors text-center">
           👥 Chọn nhanh nhóm K36
         </button>
 
-        <button id="btn-select-k39" type="button" class="btn-action bg-orange-100 text-orange-700 border border-orange-200 font-bold py-2.5 rounded-xl text-xs w-full hover:bg-orange-200 transition-colors text-center mt-2">
+        <button id="btn-select-k39" type="button" class="btn-action bg-amber-100 text-amber-700 border border-amber-200 font-bold py-2.5 rounded-xl text-xs w-full hover:bg-amber-200 transition-colors text-center mt-2">
           👥 Chọn nhanh nhóm K39
         </button>
 
-        <button id="btn-find-best-weekly" class="btn-action bg-orange-600 text-white font-bold py-3 rounded-xl shadow-md w-full text-base mt-2">
+        <button id="btn-find-best-weekly" class="btn-action bg-amber-600 text-white font-bold py-3 rounded-xl shadow-md w-full text-base mt-2">
           🔥 Xem giờ rảnh nhất nhóm này
         </button>
         
@@ -384,8 +384,8 @@
 
     <!-- TAB 5: PHÂN CÔNG CARE CARGO & CHARTER -->
     <div id="tab-cargo" class="tab-content-item space-y-6 hidden">
-      <div class="glass-card p-5 space-y-4 border-t-4 border-t-amber-500 bg-amber-50/10">
-        <div class="section-title text-amber-700">📦 Phân công Care Cargo & Charter</div>
+      <div class="glass-card p-5 space-y-4 border-t-4 border-t-orange-500 bg-orange-50/10">
+        <div class="section-title text-orange-700">📦 Phân công Care Cargo & Charter</div>
         
         <!-- Thanh bộ lọc thứ trong tuần nhanh -->
         <div class="flex gap-1.5 overflow-x-auto pb-1" id="cargo-day-filters"></div>
@@ -460,7 +460,7 @@ const db = firebase.database();
 const c = id => document.getElementById(id);
 const days = ["Thứ Hai","Thứ Ba","Thứ Tư","Thứ Năm","Thứ Sáu","Thứ Bảy","Chủ Nhật"];
 const daysOrder = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
-const priority = ["YẾN 11", "HẢI 9", "KHẢI 2", "THU 9", "LY 5", "HẰNG 14", "LẬP 2", "HUY 12", "DŨNG 12", "HUYỀN 15", "KHÁNH 2", "SƠN 12", "NGHĨA 1", "TRÂM 3", "ANH 10", "HOÀNG 10", "HUY 11", "LY 2", "HUY 14"];
+const priority = ["HẢI 9", "KHẢI 2", "THU 9", "LY 5", "HẰNG 14", "LẬP 2", "HUY 12", "DŨNG 12", "HUYỀN 15", "KHÁNH 2", "SƠN 12", "NGHĨA 1", "TRÂM 3", "ANH 10", "HOÀNG 10", "HUY 11", "LY 2", "HUY 14"];
 const dayMap = {mon:0, tue:1, wed:2, thu:3, fri:4, sat:5, sun:6};
 
 let allWeeks = {};
@@ -742,7 +742,7 @@ function renderFlightResults(nameRaw){
         
         if(!df.length && !dc.length) return;
         
-        html += `<div class="p-4 bg-white border border-slate-200 rounded-xl mb-3 shadow-sm"><div class="font-bold text-indigo-600 text-sm mb-3">📅 ${day}</div>`;
+        html += `<div class="p-4 bg-white border border-slate-200 rounded-xl mb-3 shadow-sm"><div class="font-bold text-rose-600 text-sm mb-3">📅 ${day}</div>`;
         
         df.forEach((mf, idx) => {
             const rawColleagues = flightData.filter(f => f.sheet===day && f.flt===mf.flt && f.etd===mf.etd);
@@ -751,7 +751,7 @@ function renderFlightResults(nameRaw){
             
             const flightNotes = mf.notes || [];
             const accordionId = `acc-${day}-${idx}`;
-            html += `<div class="mb-4 last:mb-0 border-b last:border-0 pb-3" id="${accordionId}"><div class="flex items-center justify-between cursor-pointer" onclick="document.getElementById('${accordionId}').classList.toggle('details-open')"><div class="flex flex-wrap items-center gap-2"><span class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[11px] font-bold uppercase">${mf.flt}</span><span class="text-sm font-bold text-slate-700">⏰ ${mf.etd}</span><span class="text-[10px] font-black text-rose-500 uppercase">Pos: ${mf.task || "..." }</span></div><span class="arrow-icon text-slate-400">▼</span></div><div class="details-content mt-3 overflow-hidden">`;
+            html += `<div class="mb-4 last:mb-0 border-b last:border-0 pb-3" id="${accordionId}"><div class="flex items-center justify-between cursor-pointer" onclick="document.getElementById('${accordionId}').classList.toggle('details-open')"><div class="flex flex-wrap items-center gap-2"><span class="bg-rose-600 text-white px-2 py-0.5 rounded text-[11px] font-bold uppercase">${mf.flt}</span><span class="text-sm font-bold text-slate-700">⏰ ${mf.etd}</span><span class="text-[10px] font-black text-rose-500 uppercase">Pos: ${mf.task || "..." }</span></div><span class="arrow-icon text-slate-400">▼</span></div><div class="details-content mt-3 overflow-hidden">`;
             
             if(flightNotes.length > 0) {
                 html += `<div class="mb-2 p-2 bg-amber-50 rounded border border-amber-100 text-[10px] font-bold text-amber-700 uppercase">📝 Ghi chú/Khác: ${flightNotes.join(", ")}</div>`;
@@ -759,7 +759,7 @@ function renderFlightResults(nameRaw){
 
             html += `<table class="staff-sub-table w-full">`;
             colleagues.forEach(col => { 
-                html += `<tr class="${col.nameNormalized===qNorm?'bg-indigo-50':''}"><td>${col.nameOnly}</td><td>${col.task}</td><td class="text-right font-mono font-bold">${getShiftForEmployee(col.nameNormalized, day)}</td></tr>`; 
+                html += `<tr class="${col.nameNormalized===qNorm?'bg-rose-50':''}"><td>${col.nameOnly}</td><td>${col.task}</td><td class="text-right font-mono font-bold">${getShiftForEmployee(col.nameNormalized, day)}</td></tr>`; 
             });
             html += `</table></div></div>`;
         });
@@ -770,14 +770,14 @@ function renderFlightResults(nameRaw){
             <div class="mb-4 last:mb-0 border-b last:border-0 pb-3" id="${accordionId}">
                 <div class="flex items-center justify-between cursor-pointer" onclick="document.getElementById('${accordionId}').classList.toggle('details-open')">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="bg-amber-600 text-white px-2 py-0.5 rounded text-[11px] font-bold uppercase">${cf.flt || 'CARGO'}</span>
+                        <span class="bg-orange-600 text-white px-2 py-0.5 rounded text-[11px] font-bold uppercase">${cf.flt || 'CARGO'}</span>
                         <span class="text-sm font-bold text-slate-700">⏰ ETD: ${cf.etd || '--:--'}</span>
-                        <span class="text-[10px] font-black text-amber-600 uppercase bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">📦 CARGO / CHARTER</span>
+                        <span class="text-[10px] font-black text-orange-600 uppercase bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">📦 CARGO / CHARTER</span>
                     </div>
                     <span class="arrow-icon text-slate-400">▼</span>
                 </div>
                 <div class="details-content mt-3 overflow-hidden">
-                    <div class="p-2.5 bg-amber-50/40 rounded-lg border border-amber-100 text-xs text-slate-600 space-y-1">
+                    <div class="p-2.5 bg-orange-50/40 rounded-lg border border-orange-100 text-xs text-slate-600 space-y-1">
                         <p>📍 <strong>Dest:</strong> ${cf.dest || '---'}</p>
                         <p>⏰ <strong>ETA:</strong> ${cf.eta || '--:--'} | 🏨 <strong>Rời KS:</strong> ${cf.hotelLeave || '--:--'}</p>
                         ${cf.remark ? `<p>📢 <strong>Remark:</strong> ${cf.remark}</p>` : ''}
@@ -798,13 +798,13 @@ c("flight-select-dropdown").onchange = e => {
     const uniqueMatches = []; const seenN = new Set();
     matches.forEach(m => { if(!seenN.has(m.nameOnly)){ uniqueMatches.push(m); seenN.add(m.nameOnly); } });
     const flightNotes = matches[0]?.notes || [];
-    let html = `<div class="p-4 bg-white border-2 border-indigo-200 rounded-xl">`;
+    let html = `<div class="p-4 bg-white border-2 border-rose-200 rounded-xl">`;
     if(flightNotes.length > 0) {
         html += `<div class="mb-3 p-2 bg-amber-50 rounded border border-amber-100 text-[11px] font-black text-amber-700 uppercase italic">📌 Ghi chú chung: ${flightNotes.join(" • ")}</div>`;
     }
     html += `<table class="w-full staff-sub-table">`;
     uniqueMatches.forEach(m => { 
-        html += `<tr><td class="font-bold text-sm">${m.nameOnly}</td><td class="text-indigo-600 font-bold text-sm">${m.task}</td><td class="text-right font-mono text-sm font-bold">${getShiftForEmployee(m.nameNormalized, sheet)}</td></tr>`; 
+        html += `<tr><td class="font-bold text-sm">${m.nameOnly}</td><td class="text-rose-600 font-bold text-sm">${m.task}</td><td class="text-right font-mono text-sm font-bold">${getShiftForEmployee(m.nameNormalized, sheet)}</td></tr>`; 
     });
     c("flight-detail-info").innerHTML = html + "</table></div>";
 };
@@ -814,7 +814,7 @@ c("search-name").oninput = e => {
     if(!q){ box.classList.add("hidden"); return; }
     const uniqueNames = [...new Set(flightData.map(f=>f.nameOnly))].filter(n=>normalizeText(n).includes(q)).slice(0,10);
     if(!uniqueNames.length){ box.classList.add("hidden"); return; }
-    box.innerHTML = uniqueNames.map(n=>`<div class="px-4 py-3 hover:bg-indigo-50 cursor-pointer font-bold text-slate-700 text-sm">${n}</div>`).join("");
+    box.innerHTML = uniqueNames.map(n=>`<div class="px-4 py-3 hover:bg-rose-50 cursor-pointer font-bold text-slate-700 text-sm">${n}</div>`).join("");
     box.classList.remove("hidden");
     box.querySelectorAll("div").forEach(div=> div.onclick=()=>{ c("search-name").value=div.textContent; box.classList.add("hidden"); renderFlightResults(div.textContent); });
 };
@@ -844,7 +844,7 @@ c("calc-week").onclick = () => {
             const isGayCa = validShifts.length > 1;
             const rowBg = isGayCa ? "row-ca-gay" : (i % 2 === 0 ? "bg-white" : "bg-slate-50");
             
-            tbody.innerHTML+=`<tr class="${rowBg} hover:bg-blue-50/50"><td class="font-bold py-3 px-4">${idx === 0 ? d : ""}</td><td><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[11px] font-bold">${item.p}</span></td><td class='text-center font-mono text-sm'>${fmtHoursToHHMM(item.r.start)}</td><td class='text-center font-mono text-sm'>${fmtHoursToHHMM(item.r.end)}</td><td class='text-center font-bold text-blue-600 text-sm'>${item.r.dur.toFixed(1)}h</td></tr>`;
+            tbody.innerHTML+=`<tr class="${rowBg} hover:bg-rose-50/50"><td class="font-bold py-3 px-4">${idx === 0 ? d : ""}</td><td><span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[11px] font-bold">${item.p}</span></td><td class='text-center font-mono text-sm'>${fmtHoursToHHMM(item.r.start)}</td><td class='text-center font-mono text-sm'>${fmtHoursToHHMM(item.r.end)}</td><td class='text-center font-bold text-rose-600 text-sm'>${item.r.dur.toFixed(1)}h</td></tr>`;
             total+=item.r.dur;
         });
     });
@@ -1002,12 +1002,12 @@ c("btn-find-best-weekly").onclick = () => {
     resDiv.innerHTML = `<h4 class="font-bold text-slate-700 text-xs uppercase mb-3 text-center">⭐ Giờ Vàng Rảnh Nhất (${windowSize}h) ⭐</h4>`;
     finalWeeklyResults.forEach(res => {
         resDiv.innerHTML += `
-            <div class="p-3 bg-white rounded-xl border border-orange-200 shadow-sm mb-2">
+            <div class="p-3 bg-white rounded-xl border border-amber-200 shadow-sm mb-2">
                 <div class="flex justify-between items-center mb-1">
                     <span class="font-black text-slate-700 text-sm">${res.day}</span>
-                    <span class="bg-orange-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">${res.count}/${selectedGoldenNames.size} rảnh</span>
+                    <span class="bg-amber-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">${res.count}/${selectedGoldenNames.size} rảnh</span>
                 </div>
-                <div class="text-base font-extrabold text-orange-600">⏰ ${fmtHoursToHHMM(res.start)} - ${fmtHoursToHHMM(res.end)}</div>
+                <div class="text-base font-extrabold text-amber-600">⏰ ${fmtHoursToHHMM(res.start)} - ${fmtHoursToHHMM(res.end)}</div>
                 <div class="text-[10px] text-slate-400 mt-1 italic leading-tight">${res.names.join(", ")}</div>
             </div>`;
     });
@@ -1019,7 +1019,7 @@ function renderCargoTab(dayKey = "MON") {
     const filterBox = c("cargo-day-filters");
     
     filterBox.innerHTML = daysOrder.map((d, idx) => {
-        const isActive = d === dayKey ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200';
+        const isActive = d === dayKey ? 'bg-orange-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200';
         return `<button onclick="renderCargoTab('${d}')" class="px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${isActive}">${days[idx].replace("Thứ ", "T")}</button>`;
     }).join("");
 
@@ -1037,10 +1037,10 @@ function renderCargoTab(dayKey = "MON") {
         <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm space-y-3">
             <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                 <div class="flex items-center gap-2">
-                    <span class="bg-amber-600 text-white px-2.5 py-0.5 rounded text-xs font-black uppercase tracking-wider">${f.flt || 'N/A'}</span>
+                    <span class="bg-orange-600 text-white px-2.5 py-0.5 rounded text-xs font-black uppercase tracking-wider">${f.flt || 'N/A'}</span>
                     <span class="text-xs font-bold text-slate-500">📍 Dest: ${f.dest || '---'}</span>
                 </div>
-                <div class="text-[11px] font-black text-amber-800 bg-amber-100/60 px-2 py-0.5 rounded-md border border-amber-200">
+                <div class="text-[11px] font-black text-orange-800 bg-orange-100/60 px-2 py-0.5 rounded-md border border-orange-200">
                     👤 NV: ${f.staff || 'Chưa xếp'}
                 </div>
             </div>
