@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LỊCH CỐNG HIẾN HGS</title>
+  <title>LỊCH CỐNG HIẾN HGS - HALLOWEEN EDITION</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
@@ -17,34 +17,36 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Lịch HGS">
-  <link rel="manifest" href='data:application/json,{"name":"Lịch Cống Hiến HGS","short_name":"Lịch HGS","start_url":".","display":"standalone","background_color":"#f0f4f8","theme_color":"#f43f5e"}'>
+  <link rel="manifest" href='data:application/json,{"name":"Lịch Cống Hiến HGS","short_name":"Lịch HGS","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#ea580c"}'>
 
   <style>
     html { font-size: 17px; scroll-behavior: smooth; } 
     body { 
       font-family: 'Plus Jakarta Sans', sans-serif; 
-      background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); 
-      color: #1e293b; 
+      background: radial-gradient(circle at top, #1e1b4b 0%, #0f172a 60%, #020617 100%); 
+      color: #f1f5f9; 
       min-height: 100vh;
     }
     .glass-card { 
-      background: rgba(255, 255, 255, 0.95); 
+      background: rgba(30, 27, 75, 0.75); 
       border-radius: 1.25rem; 
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(234, 88, 12, 0.15);
+      border: 1px solid rgba(249, 115, 22, 0.2);
+      backdrop-filter: blur(12px);
       transition: transform 0.2s;
     }
     .section-title {
-      display: flex; align-items: center; gap: 8px; font-weight: 700; color: #334155;
-      margin-bottom: 1rem; border-left: 4px solid #f43f5e; padding-left: 12px;
+      display: flex; align-items: center; gap: 8px; font-weight: 700; color: #fdba74;
+      margin-bottom: 1rem; border-left: 4px solid #f97316; padding-left: 12px;
     }
     .btn-action { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
     .btn-action:active { transform: scale(0.97); }
     
     .toast {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-      background: #1e293b; color: white; padding: 12px 24px;
-      border-radius: 99px; font-weight: 600; z-index: 9999; animation: slideDownUp 2.5s forwards;
+      background: #ea580c; color: white; padding: 12px 24px;
+      border-radius: 99px; font-weight: 700; z-index: 9999; animation: slideDownUp 2.5s forwards;
+      box-shadow: 0 0 15px rgba(234, 88, 12, 0.6);
     }
     @keyframes slideDownUp {
       0% { opacity: 0; transform: translate(-50%, -20px); }
@@ -52,25 +54,25 @@
       100% { opacity: 0; transform: translate(-50%, -20px); }
     }
     
-    .day-container { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; transition: all 0.2s; }
-    .day-container:focus-within { border-color: #f43f5e; box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1); }
-    .day-even { background: #ffffff; }
-    .day-odd { background: #f8fafc; }
+    .day-container { border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 12px; padding: 12px; transition: all 0.2s; }
+    .day-container:focus-within { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3); }
+    .day-even { background: rgba(15, 23, 42, 0.6); }
+    .day-odd { background: rgba(30, 27, 75, 0.4); }
 
-    .staff-sub-table td { padding: 8px 10px !important; font-size: 0.85rem; }
+    .staff-sub-table td { padding: 8px 10px !important; font-size: 0.85rem; border-color: rgba(255,255,255,0.05); }
 
     #cloud-status {
       font-size: 10px; font-weight: 800; padding: 2px 10px; border-radius: 20px;
       text-transform: uppercase;
     }
-    .status-online { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-    .status-offline { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .status-online { background: #064e3b; color: #6ee7b7; border: 1px solid #047857; }
+    .status-offline { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
 
-    .tet-text {
-      background: linear-gradient(to bottom, #e11d48, #be123c);
+    .halloween-text {
+      background: linear-gradient(to bottom, #fb923c, #ea580c, #c026d3);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 2px 2px 4px rgba(225, 29, 72, 0.2);
+      text-shadow: 0 0 12px rgba(234, 88, 12, 0.4);
     }
 
     .arrow-icon { transition: transform 0.3s ease; }
@@ -84,20 +86,20 @@
         right: 5px;
         width: 12px;
         height: 12px;
-        background: rgba(0,0,0,0.03);
+        background: rgba(255,255,255,0.05);
         border-radius: 50%;
         cursor: pointer;
         z-index: 1000;
     }
 
-    @keyframes pulse-red {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
-      70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+    @keyframes pulse-halloween {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.7); }
+      70% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(234, 88, 12, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); }
     }
     .btn-muaban {
-      animation: pulse-red 2s infinite;
-      background: linear-gradient(90deg, #f43f5e, #fb7185);
+      animation: pulse-halloween 2s infinite;
+      background: linear-gradient(90deg, #ea580c, #c026d3);
       display: block;
       width: 100%;
       padding: 14px;
@@ -106,7 +108,7 @@
       font-weight: 900;
       text-align: center;
       margin-top: 15px;
-      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+      box-shadow: 0 4px 20px rgba(234, 88, 12, 0.4);
       text-decoration: none;
       transition: all 0.3s;
     }
@@ -117,10 +119,10 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: white;
-      border: 1px solid #e2e8f0;
+      background: #1e1b4b;
+      border: 1px solid rgba(249, 115, 22, 0.3);
       border-radius: 0.75rem;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       z-index: 50;
       max-height: 250px;
       overflow-y: auto;
@@ -131,17 +133,17 @@
       align-items: center;
       padding: 10px 12px;
       cursor: pointer;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       transition: background 0.2s;
     }
-    .search-item:hover { background: #f8fafc; }
-    .search-item input { width: 18px; height: 18px; margin-right: 12px; cursor: pointer; }
-    .search-item span { font-size: 14px; font-weight: 600; color: #334155; }
+    .search-item:hover { background: rgba(249, 115, 22, 0.2); }
+    .search-item input { width: 18px; height: 18px; margin-right: 12px; cursor: pointer; accent-color: #ea580c; }
+    .search-item span { font-size: 14px; font-weight: 600; color: #fed7aa; }
 
     .selection-summary {
       font-size: 11px;
       font-weight: 700;
-      color: #64748b;
+      color: #fb923c;
       margin-top: 4px;
       padding-left: 4px;
     }
@@ -151,21 +153,21 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(255, 241, 242, 0.96);
+      background: rgba(15, 23, 42, 0.92);
       backdrop-filter: blur(12px);
       padding-top: 10px;
       padding-bottom: 10px;
       margin-bottom: 16px;
-      border-bottom: 1px solid rgba(254, 205, 211, 0.8);
+      border-bottom: 1px solid rgba(249, 115, 22, 0.3);
     }
     
     /* [Ca Gãy] Định dạng màu sắc trực quan làm nổi bật hàng bị gãy ca */
     .row-ca-gay {
-      background-color: #fee2e2 !important; 
+      background-color: rgba(127, 29, 29, 0.5) !important; 
       border-left: 4px solid #ef4444 !important;
     }
     .row-ca-gay td {
-      color: #991b1b !important;
+      color: #fca5a5 !important;
     }
 
     /* Giao diện nút bấm chọn Tab điều hướng */
@@ -173,26 +175,32 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tab-btn.active {
-      background-color: #f43f5e !important;
+      background-color: #ea580c !important;
       color: white !important;
-      box-shadow: 0 4px 6px -1px rgba(244, 63, 94, 0.2);
+      box-shadow: 0 0 12px rgba(234, 88, 12, 0.5);
     }
 
     /* [Chart CSS] - Dành riêng cho Tab So Sánh Biểu Đồ */
-    .timeline-line { position: absolute; border-left: 1px dashed #cbd5e1; height: 100%; top: 0; }
-    .timeline-label { position: absolute; top: -20px; left: -10px; font-size: 10px; color: #64748b; font-weight: bold; }
+    .timeline-line { position: absolute; border-left: 1px dashed rgba(255,255,255,0.15); height: 100%; top: 0; }
+    .timeline-label { position: absolute; top: -20px; left: -10px; font-size: 10px; color: #fb923c; font-weight: bold; }
     .compare-row { position: relative; height: 40px; margin-bottom: 8px; display: flex; align-items: center; }
-    .compare-name { width: 90px; min-width: 90px; font-size: 11px; font-weight: 800; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
-    .compare-track { flex: 1; position: relative; height: 100%; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .compare-name { width: 90px; min-width: 90px; font-size: 11px; font-weight: 800; color: #fed7aa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
+    .compare-track { flex: 1; position: relative; height: 100%; background: rgba(15, 23, 42, 0.8); border-radius: 8px; border: 1px solid rgba(249, 115, 22, 0.2); }
     .shift-bar {
       position: absolute; top: 50%; transform: translateY(-50%); height: 26px; border-radius: 6px;
-      background: linear-gradient(90deg, #fb7185, #f43f5e);
+      background: linear-gradient(90deg, #ea580c, #c026d3);
       color: white; font-size: 10px; font-weight: 800;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 6px rgba(244, 63, 94, 0.3); white-space: nowrap; overflow: hidden;
+      display: flex; align-items: center; justify-content: justify-center;
+      box-shadow: 0 2px 8px rgba(234, 88, 12, 0.4); white-space: nowrap; overflow: hidden;
       cursor: pointer; transition: transform 0.2s;
     }
     .shift-bar:hover { transform: translateY(-50%) scale(1.05); }
+
+    /* Custom select / inputs dark theme */
+    select option {
+      background-color: #1e1b4b;
+      color: #f1f5f9;
+    }
   </style>
 </head>
 
@@ -200,23 +208,23 @@
   <div class="max-w-2xl mx-auto space-y-6">
     
     <header class="text-center space-y-3">
-      <h2 class="text-2xl md:text-3xl font-black tet-text tracking-tight uppercase leading-tight">
-        🌸 Chào Mừng Ngày 20/10 - Tôn Vinh Một Nửa Thế Giới 💐✨
+      <h2 class="text-2xl md:text-3xl font-black halloween-text tracking-tight uppercase leading-tight">
+        🎃 HAPPY HALLOWEEN - TRICK OR TREAT! 👻✨
       </h2>
       
       <div class="flex flex-col items-center gap-2">
         <a href="https://www.facebook.com/huy.hai.333030" target="_blank"
-           class="inline-block px-5 py-2 bg-white/70 text-rose-600 font-bold text-sm rounded-full shadow-sm border border-rose-100 hover:bg-white transition-all">
-          🌸 Created by Hải 9 💐
+           class="inline-block px-5 py-2 bg-amber-500/10 text-orange-400 font-bold text-sm rounded-full shadow-sm border border-orange-500/30 hover:bg-amber-500/20 transition-all">
+          🦇 Created by Hải 9 🎃
         </a>
       </div>
 
       <div class="pt-2">
         <div id="cloud-status" class="status-offline">Đang kết nối...</div>
-        <h1 class="text-xl font-extrabold text-slate-700 block mt-1">📅 LỊCH CỐNG HIẾN HGS</h1>
+        <h1 class="text-xl font-extrabold text-orange-300 block mt-1">📅 LỊCH CỐNG HIẾN HGS</h1>
         
         <a href="https://huyhaile11.github.io/banca/" target="_blank" class="btn-muaban">
-           💌 TRAO ĐỔI CA BẤM VÀO ĐÂY 💌
+           🔮 TRAO ĐỔI CA BẤM VÀO ĐÂY 🔮
         </a>
       </div>
     </header>
@@ -227,18 +235,18 @@
         <!-- Khu vực chọn tuần làm việc được đưa lên header ghim cố định -->
         <div class="px-2 flex gap-2 items-end">
           <div class="flex-1 text-left">
-            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Chọn tuần làm việc:</label>
-            <select id="week-select" class="w-full border-2 border-rose-100 rounded-xl px-4 py-2.5 bg-white font-bold text-rose-800 shadow-sm outline-none focus:ring-2 focus:ring-rose-400">
+            <label class="text-[10px] font-bold text-orange-400 uppercase ml-1">Chọn tuần làm việc:</label>
+            <select id="week-select" class="w-full border-2 border-orange-500/40 rounded-xl px-4 py-2.5 bg-slate-900/90 font-bold text-orange-300 shadow-sm outline-none focus:ring-2 focus:ring-orange-500">
                 <option value="">-- Đang tải dữ liệu... --</option>
             </select>
           </div>
-          <button id="btn-delete-week" class="bg-rose-50 text-rose-500 p-2.5 rounded-xl border border-rose-100 hover:bg-rose-500 hover:text-white transition-colors" title="Xoá tuần này">
+          <button id="btn-delete-week" class="bg-red-950/60 text-red-400 p-2.5 rounded-xl border border-red-800/50 hover:bg-red-700 hover:text-white transition-colors" title="Xoá tuần này">
             🗑️
           </button>
         </div>
 
-        <!-- Hệ thống Tab điều hướng chức năng tiện dụng (Chỉnh sang grid-cols-3 md:grid-cols-6 để có đủ không gian) -->
-        <div class="grid grid-cols-3 md:grid-cols-6 gap-1 bg-slate-200/60 p-1 rounded-xl text-[10px] md:text-xs font-black text-slate-600 text-center">
+        <!-- Hệ thống Tab điều hướng chức năng tiện dụng -->
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-1 bg-slate-900/80 p-1 rounded-xl text-[10px] md:text-xs font-black text-slate-400 text-center border border-orange-500/20">
           <button onclick="switchTab('tab-ca-nhan')" id="btn-tab-ca-nhan" class="tab-btn active py-2.5 rounded-lg">👤 Cá Nhân</button>
           <button onclick="switchTab('tab-chuyen-bay')" id="btn-tab-chuyen-bay" class="tab-btn py-2.5 rounded-lg">✈️ Đội Bay</button>
           <button onclick="switchTab('tab-doi-ca')" id="btn-tab-doi-ca" class="tab-btn py-2.5 rounded-lg">🤝 Đổi Ca</button>
@@ -255,26 +263,26 @@
     <div id="tab-ca-nhan" class="tab-content-item space-y-6">
       <div class="glass-card p-5 space-y-4">
         <div class="section-title cursor-pointer" id="secret-yen-trigger">📝 Xem lịch cá nhân</div>
-        <select id="employee-select" class="w-full border border-slate-200 rounded-xl text-base px-4 py-3 bg-rose-50 font-semibold text-rose-800 outline-none focus:ring-2 focus:ring-rose-400">
+        <select id="employee-select" class="w-full border border-orange-500/30 rounded-xl text-base px-4 py-3 bg-slate-900/90 font-semibold text-orange-300 outline-none focus:ring-2 focus:ring-orange-500">
             <option value="">-- Chọn nhân viên --</option>
         </select>
         <div id="days-container" class="grid grid-cols-1 gap-2.5"></div>
         <div class="grid grid-cols-2 gap-3 pt-2">
-          <button id="calc-week" class="btn-action bg-rose-600 text-white rounded-xl py-4 font-bold shadow-md hover:bg-rose-700">📅 Tính giờ tuần</button>
-          <button id="clear-week" class="btn-action bg-slate-400 text-white rounded-xl py-4 font-bold shadow-md hover:bg-slate-500">🧹 Xóa trắng</button>
+          <button id="calc-week" class="btn-action bg-orange-600 text-white rounded-xl py-4 font-bold shadow-md hover:bg-orange-500">📅 Tính giờ tuần</button>
+          <button id="clear-week" class="btn-action bg-slate-700 text-white rounded-xl py-4 font-bold shadow-md hover:bg-slate-600">🧹 Xóa trắng</button>
         </div>
       </div>
 
       <div id="result-container" class="hidden glass-card p-5 overflow-hidden">
         <div class="flex justify-between items-center mb-4">
           <div class="section-title mb-0">📊 Bảng tổng hợp</div>
-          <button id="btn-export-image" class="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-emerald-600 transition-all">
+          <button id="btn-export-image" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-emerald-500 transition-all">
             📸 Tải ảnh lịch
           </button>
         </div>
-        <div class="overflow-x-auto rounded-xl border border-slate-100">
+        <div class="overflow-x-auto rounded-xl border border-orange-500/20">
           <table class="w-full text-sm">
-            <thead class="bg-slate-800 text-white">
+            <thead class="bg-slate-900 text-orange-400">
               <tr>
                 <th class="px-4 py-3 text-left">Thứ</th>
                 <th class="px-4 py-3 text-left">Ca</th>
@@ -283,27 +291,27 @@
                 <th class="px-4 py-3 text-center font-bold">Tổng</th>
               </tr>
             </thead>
-            <tbody id="result-body" class="divide-y divide-slate-100"></tbody>
+            <tbody id="result-body" class="divide-y divide-slate-800"></tbody>
           </table>
         </div>
-        <div id="gay-doi-nguoi" class="hidden mt-4 text-center text-red-600 font-bold text-base animate-pulse italic">
-          ⚠️ Tuần này bạn gãy đôi người, cố lên nhé!
+        <div id="gay-doi-nguoi" class="hidden mt-4 text-center text-red-400 font-bold text-base animate-pulse italic">
+          ⚠️ Tuần này bạn gãy đôi người, cố lên nhé! 🧙‍♀️
         </div>
       </div>
     </div>
 
     <!-- TAB 2: CHUYỂN BAY & ĐỒNG ĐỘI -->
     <div id="tab-chuyen-bay" class="tab-content-item space-y-6 hidden">
-      <div class="glass-card p-5 space-y-4 border-t-4 border-t-rose-500">
+      <div class="glass-card p-5 space-y-4 border-t-4 border-t-orange-500">
         <div class="section-title">🔍 Chuyến bay & Đồng đội</div>
         <div class="grid grid-cols-1 gap-3">
           <div class="relative">
             <input id="search-name" type="text" placeholder="Tìm tên nhân viên..."
-                   class="w-full border border-slate-200 rounded-xl px-4 py-3 pl-10 text-base focus:ring-2 focus:ring-rose-400 outline-none shadow-sm" autocomplete="off">
+                   class="w-full border border-orange-500/30 bg-slate-900/90 text-slate-100 rounded-xl px-4 py-3 pl-10 text-base focus:ring-2 focus:ring-orange-500 outline-none shadow-sm" autocomplete="off">
             <span class="absolute left-3 top-4 opacity-40">👤</span>
-            <div id="suggestions" class="absolute w-full bg-white border border-slate-200 rounded-xl shadow-xl mt-1 hidden z-50 max-h-60 overflow-y-auto"></div>
+            <div id="suggestions" class="absolute w-full bg-slate-900 border border-orange-500/30 rounded-xl shadow-xl mt-1 hidden z-50 max-h-60 overflow-y-auto"></div>
           </div>
-          <select id="flight-select-dropdown" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base bg-rose-50 font-medium text-rose-900 outline-none focus:ring-2 focus:ring-rose-400">
+          <select id="flight-select-dropdown" class="w-full border border-orange-500/30 rounded-xl px-4 py-3 text-base bg-slate-900/90 font-medium text-orange-300 outline-none focus:ring-2 focus:ring-orange-500">
             <option value="">-- Hoặc chọn theo chuyến bay --</option>
           </select>
         </div>
@@ -314,67 +322,67 @@
 
     <!-- TAB 3: TÌM NGƯỜI LÀM HỘ -->
     <div id="tab-doi-ca" class="tab-content-item space-y-6 hidden">
-      <div class="glass-card p-5 space-y-4 border-t-4 border-t-emerald-500 bg-emerald-50/20">
-        <div class="section-title text-emerald-700">🤝 Tìm người làm hộ</div>
+      <div class="glass-card p-5 space-y-4 border-t-4 border-t-emerald-500">
+        <div class="section-title text-emerald-400">🤝 Tìm người làm hộ</div>
         <div class="grid grid-cols-2 gap-3">
-          <div class="p-3 bg-white rounded-xl border border-emerald-100">
-            <p class="text-[10px] font-bold text-emerald-600 uppercase">Bắt đầu</p>
+          <div class="p-3 bg-slate-900/80 rounded-xl border border-emerald-500/30">
+            <p class="text-[10px] font-bold text-emerald-400 uppercase">Bắt đầu</p>
             <div class="flex gap-1">
-              <select id="help-start-day" class="flex-1 bg-transparent text-sm font-semibold outline-none"></select>
-              <input id="help-start-time" type="number" step="0.5" placeholder="0.0" class="w-12 text-center border-b border-emerald-200 font-bold text-emerald-700 text-base">
+              <select id="help-start-day" class="flex-1 bg-transparent text-sm font-semibold text-emerald-200 outline-none"></select>
+              <input id="help-start-time" type="number" step="0.5" placeholder="0.0" class="w-12 text-center border-b border-emerald-500/50 bg-transparent font-bold text-emerald-300 text-base">
             </div>
           </div>
-          <div class="p-3 bg-white rounded-xl border border-emerald-100">
-            <p class="text-[10px] font-bold text-emerald-600 uppercase">Kết thúc</p>
+          <div class="p-3 bg-slate-900/80 rounded-xl border border-emerald-500/30">
+            <p class="text-[10px] font-bold text-emerald-400 uppercase">Kết thúc</p>
             <div class="flex gap-1">
-              <select id="help-end-day" class="flex-1 bg-transparent text-sm font-semibold outline-none"></select>
-              <input id="help-end-time" type="number" step="0.5" placeholder="0.0" class="w-12 text-center border-b border-emerald-200 font-bold text-emerald-700 text-base">
+              <select id="help-end-day" class="flex-1 bg-transparent text-sm font-semibold text-emerald-200 outline-none"></select>
+              <input id="help-end-time" type="number" step="0.5" placeholder="0.0" class="w-12 text-center border-b border-emerald-500/50 bg-transparent font-bold text-emerald-300 text-base">
             </div>
           </div>
         </div>
 
         <div class="relative">
           <input id="help-search-input" type="text" placeholder="Tìm & tích chọn người muốn soi ca..." 
-                 class="w-full border border-emerald-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-400 outline-none shadow-sm" autocomplete="off">
+                 class="w-full border border-emerald-500/30 bg-slate-900/90 text-slate-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm" autocomplete="off">
           <div id="help-dropdown" class="search-dropdown hidden"></div>
-          <div id="help-selection-summary" class="selection-summary">Đã chọn: 0 người</div>
+          <div id="help-selection-summary" class="selection-summary text-emerald-400">Đã chọn: 0 người</div>
         </div>
 
-        <button id="btn-find-help" class="btn-action bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-md w-full text-base">🔍 Kiểm tra rảnh / bận</button>
+        <button id="btn-find-help" class="btn-action bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-md w-full text-base hover:bg-emerald-500">🔍 Kiểm tra rảnh / bận</button>
         
-        <div id="help-result" class="hidden p-3 bg-white rounded-xl border border-emerald-200 max-h-40 overflow-y-auto">
-            <ul id="help-list" class="grid grid-cols-1 gap-2 text-sm font-medium text-slate-600"></ul>
+        <div id="help-result" class="hidden p-3 bg-slate-900/80 rounded-xl border border-emerald-500/30 max-h-40 overflow-y-auto">
+            <ul id="help-list" class="grid grid-cols-1 gap-2 text-sm font-medium text-slate-300"></ul>
         </div>
       </div>
     </div>
 
     <!-- TAB 4: GIỜ VÀNG ĐỒNG ĐỘI -->
     <div id="tab-gio-vang" class="tab-content-item space-y-6 hidden">
-      <div class="glass-card p-5 space-y-4 border-t-4 border-t-amber-500 bg-amber-50/20">
-        <div class="section-title text-amber-700">🏆 "Giờ Vàng" Theo Ngày</div>
+      <div class="glass-card p-5 space-y-4 border-t-4 border-t-amber-500">
+        <div class="section-title text-amber-400">🏆 "Giờ Vàng" Theo Ngày</div>
         
-        <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-amber-100 shadow-sm">
-          <label class="text-sm font-bold text-amber-700">Số tiếng muốn tìm:</label>
+        <div class="flex items-center justify-between bg-slate-900/80 p-3 rounded-xl border border-amber-500/30 shadow-sm">
+          <label class="text-sm font-bold text-amber-300">Số tiếng muốn tìm:</label>
           <input id="golden-hours-count" type="number" value="8" step="0.5" min="0.5" max="24" 
-                 class="w-20 border-2 border-amber-200 rounded-lg px-2 py-1 text-center font-black text-amber-600 outline-none focus:border-amber-500">
+                 class="w-20 border-2 border-amber-500/40 bg-slate-950 rounded-lg px-2 py-1 text-center font-black text-amber-400 outline-none focus:border-amber-400">
         </div>
 
         <div class="relative">
           <input id="golden-search-input" type="text" placeholder="Tìm & tích chọn người muốn tìm giờ vàng..." 
-                 class="w-full border border-amber-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-amber-400 outline-none shadow-sm" autocomplete="off">
+                 class="w-full border border-amber-500/30 bg-slate-900/90 text-slate-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-amber-500 outline-none shadow-sm" autocomplete="off">
           <div id="golden-dropdown" class="search-dropdown hidden"></div>
-          <div id="golden-selection-summary" class="selection-summary">Đã chọn: 0 người</div>
+          <div id="golden-selection-summary" class="selection-summary text-amber-400">Đã chọn: 0 người</div>
         </div>
 
-        <button id="btn-select-k36" type="button" class="btn-action bg-amber-100 text-amber-700 border border-amber-200 font-bold py-2.5 rounded-xl text-xs w-full hover:bg-amber-200 transition-colors text-center">
+        <button id="btn-select-k36" type="button" class="btn-action bg-amber-950/60 text-amber-300 border border-amber-500/30 font-bold py-2.5 rounded-xl text-xs w-full hover:bg-amber-900/60 transition-colors text-center">
           👥 Chọn nhanh nhóm K36
         </button>
 
-        <button id="btn-select-k39" type="button" class="btn-action bg-amber-100 text-amber-700 border border-amber-200 font-bold py-2.5 rounded-xl text-xs w-full hover:bg-amber-200 transition-colors text-center mt-2">
+        <button id="btn-select-k39" type="button" class="btn-action bg-amber-950/60 text-amber-300 border border-amber-500/30 font-bold py-2.5 rounded-xl text-xs w-full hover:bg-amber-900/60 transition-colors text-center mt-2">
           👥 Chọn nhanh nhóm K39
         </button>
 
-        <button id="btn-find-best-weekly" class="btn-action bg-amber-600 text-white font-bold py-3 rounded-xl shadow-md w-full text-base mt-2">
+        <button id="btn-find-best-weekly" class="btn-action bg-amber-600 text-white font-bold py-3 rounded-xl shadow-md w-full text-base hover:bg-amber-500 mt-2">
           🔥 Xem giờ rảnh nhất nhóm này
         </button>
         
@@ -384,55 +392,55 @@
 
     <!-- TAB 5: PHÂN CÔNG CARE CARGO & CHARTER -->
     <div id="tab-cargo" class="tab-content-item space-y-6 hidden">
-      <div class="glass-card p-5 space-y-4 border-t-4 border-t-orange-500 bg-orange-50/10">
-        <div class="section-title text-orange-700">📦 Phân công Care Cargo & Charter</div>
+      <div class="glass-card p-5 space-y-4 border-t-4 border-t-purple-500">
+        <div class="section-title text-purple-400">📦 Phân công Care Cargo & Charter</div>
         
         <!-- Thanh bộ lọc thứ trong tuần nhanh -->
         <div class="flex gap-1.5 overflow-x-auto pb-1" id="cargo-day-filters"></div>
 
         <!-- Danh sách chuyến bay Cargo hiển thị trực quan -->
         <div id="cargo-list-container" class="space-y-3">
-            <p class="text-slate-400 italic text-center py-4 text-sm">Vui lòng chọn tuần để tải phân công.</p>
+            <p class="text-slate-500 italic text-center py-4 text-sm">Vui lòng chọn tuần để tải phân công.</p>
         </div>
       </div>
     </div>
 
     <!-- TAB 6: SO SÁNH LỊCH BẰNG BIỂU ĐỒ -->
     <div id="tab-so-sanh" class="tab-content-item space-y-6 hidden">
-      <div class="glass-card p-5 space-y-4 border-t-4 border-t-cyan-500 bg-cyan-50/10">
-        <div class="section-title text-cyan-700">📊 So Sánh Lịch Chạy Ca</div>
+      <div class="glass-card p-5 space-y-4 border-t-4 border-t-cyan-500">
+        <div class="section-title text-cyan-400">📊 So Sánh Lịch Chạy Ca</div>
         
         <div class="relative">
           <input id="compare-search-input" type="text" placeholder="Tìm & tích chọn người muốn so sánh..." 
-                 class="w-full border border-cyan-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cyan-400 outline-none shadow-sm" autocomplete="off">
+                 class="w-full border border-cyan-500/30 bg-slate-900/90 text-slate-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cyan-500 outline-none shadow-sm" autocomplete="off">
           <div id="compare-dropdown" class="search-dropdown hidden"></div>
-          <div id="compare-selection-summary" class="selection-summary">Đã chọn: 0 người</div>
+          <div id="compare-selection-summary" class="selection-summary text-cyan-400">Đã chọn: 0 người</div>
         </div>
 
         <!-- Thanh bộ lọc thứ trong tuần nhanh -->
         <div class="flex gap-1.5 overflow-x-auto pb-1 mt-3" id="compare-day-filters"></div>
 
         <!-- Vùng chứa Timeline Chart -->
-        <div class="mt-4 bg-white rounded-xl border border-slate-200 p-4 shadow-sm relative w-full">
+        <div class="mt-4 bg-slate-950/80 rounded-xl border border-cyan-500/30 p-4 shadow-sm relative w-full overflow-hidden">
             <div id="compare-chart-container" class="min-w-full">
-               <p class="text-slate-400 italic text-center py-6 text-sm">Vui lòng tìm và chọn nhân viên ở trên để vẽ biểu đồ.</p>
+               <p class="text-slate-500 italic text-center py-6 text-sm">Vui lòng tìm và chọn nhân viên ở trên để vẽ biểu đồ.</p>
             </div>
         </div>
       </div>
     </div>
 
-    <!-- 📌 PHỤ LỤC TIỆN ÍCH CỐ ĐỊNH Ở CUỐI TRANG (Hiển thị ở tất cả các tab) -->
-    <div class="glass-card p-5 space-y-3 border-t-4 border-t-slate-400 bg-slate-50/50 text-xs text-slate-600 mt-6">
-      <div class="font-bold text-sm text-slate-700 flex items-center gap-2">📌 PHỤ LỤC TIỆN ÍCH</div>
+    <!-- 📌 PHỤ LỤC TIỆN ÍCH CỐ ĐỊNH Ở CUỐI TRANG -->
+    <div class="glass-card p-5 space-y-3 border-t-4 border-t-slate-600 text-xs text-slate-300 mt-6">
+      <div class="font-bold text-sm text-orange-400 flex items-center gap-2">📌 PHỤ LỤC TIỆN ÍCH</div>
       <ul class="space-y-2 font-semibold">
         <li class="flex items-center gap-2">
-          🌐 <a href="https://huyhaile11.github.io/country-codes/" target="_blank" class="text-blue-600 hover:underline">Tra code các nước</a>
+          🌐 <a href="https://huyhaile11.github.io/country-codes/" target="_blank" class="text-orange-400 hover:underline">Tra code các nước</a>
         </li>
         <li class="flex items-center gap-2">
-          ✈️ <a href="https://huyhaile11.github.io/JejuAir/" target="_blank" class="text-blue-600 hover:underline">Chính sách hãng 7C</a>
+          ✈️ <a href="https://huyhaile11.github.io/JejuAir/" target="_blank" class="text-orange-400 hover:underline">Chính sách hãng 7C</a>
         </li>
         <li class="flex items-center gap-2">
-          👶 <a href="https://huyhaile11.github.io/TinhTuoi/" target="_blank" class="text-blue-600 hover:underline">Tính tuổi CHD, Tuần thai</a>
+          👶 <a href="https://huyhaile11.github.io/TinhTuoi/" target="_blank" class="text-orange-400 hover:underline">Tính tuổi CHD, Tuần thai</a>
         </li>
       </ul>
     </div>
@@ -460,7 +468,7 @@ const db = firebase.database();
 const c = id => document.getElementById(id);
 const days = ["Thứ Hai","Thứ Ba","Thứ Tư","Thứ Năm","Thứ Sáu","Thứ Bảy","Chủ Nhật"];
 const daysOrder = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
-const priority = ["YẾN 11","HẢI 9", "KHẢI 2", "THU 9", "LY 5", "HẰNG 14", "LẬP 2", "HUY 12", "DŨNG 12", "HUYỀN 15", "KHÁNH 2", "SƠN 12", "NGHĨA 1", "TRÂM 3", "ANH 10", "HOÀNG 10", "HUY 11", "LY 2", "HUY 14"];
+const priority = ["HẢI 9", "KHẢI 2", "THU 9", "LY 5", "HẰNG 14", "LẬP 2", "HUY 12", "DŨNG 12", "HUYỀN 15", "KHÁNH 2", "SƠN 12", "NGHĨA 1", "TRÂM 3", "ANH 10", "HOÀNG 10", "HUY 11", "LY 2", "HUY 14"];
 const dayMap = {mon:0, tue:1, wed:2, thu:3, fri:4, sat:5, sun:6};
 
 let allWeeks = {};
@@ -473,7 +481,7 @@ let selectedHelpNames = new Set();
 let selectedGoldenNames = new Set();
 let selectedCompareNames = new Set(); 
 let currentCargoDay = "MON"; 
-let currentCompareDay = "all"; // Mặc định hiển thị tất cả các ngày trong tab so sánh
+let currentCompareDay = "all";
 
 function switchTab(tabId) {
     document.querySelectorAll('.tab-content-item').forEach(el => el.classList.add('hidden'));
@@ -487,11 +495,11 @@ db.ref("hgs_weeks").on("value", (snap) => {
     const data = snap.val();
     if(data){
         allWeeks = data;
-        c("cloud-status").textContent = "Dữ liệu: ONLINE";
+        c("cloud-status").textContent = "Dữ liệu: ONLINE 🎃";
         c("cloud-status").className = "status-online";
         updateWeekDropdown();
     } else {
-        c("cloud-status").textContent = "Dữ liệu: TRỐNG";
+        c("cloud-status").textContent = "Dữ liệu: TRỐNG 👻";
         c("cloud-status").className = "status-offline";
         c("week-select").innerHTML = '<option value="">-- Chưa có dữ liệu --</option>';
     }
@@ -706,7 +714,7 @@ function createInputs(){
     const box = c("days-container"); box.innerHTML = "";
     days.forEach((d,i)=>{
         const bgClass = i % 2 === 0 ? "day-even" : "day-odd";
-        box.innerHTML += `<div class="day-container ${bgClass}"><label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-0.5">${d}</label><input id="day${i}" type="text" placeholder="Nhập ca..." enterkeyhint="next" class="w-full bg-transparent text-base font-bold text-slate-700 outline-none"></div>`;
+        box.innerHTML += `<div class="day-container ${bgClass}"><label class="block text-[10px] font-extrabold text-orange-400 uppercase mb-0.5">${d}</label><input id="day${i}" type="text" placeholder="Nhập ca..." enterkeyhint="next" class="w-full bg-transparent text-base font-bold text-slate-100 outline-none"></div>`;
     });
     const opts = days.map((d,i)=>`<option value="${daysOrder[i].toLowerCase()}">${d}</option>`).join("");
     c('help-start-day').innerHTML = opts; c('help-end-day').innerHTML = opts;
@@ -731,7 +739,7 @@ function renderFlightResults(nameRaw){
     const myCargoFlights = cargoData.filter(f => f.staff && normalizeText(f.staff).includes(qNorm));
     
     if(!uniqueMyFlights.length && !myCargoFlights.length){ 
-        container.innerHTML="<p class='text-slate-400 italic text-center p-2 text-sm'>Trống.</p>"; 
+        container.innerHTML="<p class='text-slate-500 italic text-center p-2 text-sm'>Trống.</p>"; 
         return; 
     }
     
@@ -742,7 +750,7 @@ function renderFlightResults(nameRaw){
         
         if(!df.length && !dc.length) return;
         
-        html += `<div class="p-4 bg-white border border-slate-200 rounded-xl mb-3 shadow-sm"><div class="font-bold text-rose-600 text-sm mb-3">📅 ${day}</div>`;
+        html += `<div class="p-4 bg-slate-900/80 border border-orange-500/30 rounded-xl mb-3 shadow-sm"><div class="font-bold text-orange-400 text-sm mb-3">📅 ${day}</div>`;
         
         df.forEach((mf, idx) => {
             const rawColleagues = flightData.filter(f => f.sheet===day && f.flt===mf.flt && f.etd===mf.etd);
@@ -751,15 +759,15 @@ function renderFlightResults(nameRaw){
             
             const flightNotes = mf.notes || [];
             const accordionId = `acc-${day}-${idx}`;
-            html += `<div class="mb-4 last:mb-0 border-b last:border-0 pb-3" id="${accordionId}"><div class="flex items-center justify-between cursor-pointer" onclick="document.getElementById('${accordionId}').classList.toggle('details-open')"><div class="flex flex-wrap items-center gap-2"><span class="bg-rose-600 text-white px-2 py-0.5 rounded text-[11px] font-bold uppercase">${mf.flt}</span><span class="text-sm font-bold text-slate-700">⏰ ${mf.etd}</span><span class="text-[10px] font-black text-rose-500 uppercase">Pos: ${mf.task || "..." }</span></div><span class="arrow-icon text-slate-400">▼</span></div><div class="details-content mt-3 overflow-hidden">`;
+            html += `<div class="mb-4 last:mb-0 border-b border-slate-800 last:border-0 pb-3" id="${accordionId}"><div class="flex items-center justify-between cursor-pointer" onclick="document.getElementById('${accordionId}').classList.toggle('details-open')"><div class="flex flex-wrap items-center gap-2"><span class="bg-orange-600 text-white px-2 py-0.5 rounded text-[11px] font-bold uppercase">${mf.flt}</span><span class="text-sm font-bold text-slate-200">⏰ ${mf.etd}</span><span class="text-[10px] font-black text-orange-400 uppercase">Pos: ${mf.task || "..." }</span></div><span class="arrow-icon text-slate-500">▼</span></div><div class="details-content mt-3 overflow-hidden">`;
             
             if(flightNotes.length > 0) {
-                html += `<div class="mb-2 p-2 bg-amber-50 rounded border border-amber-100 text-[10px] font-bold text-amber-700 uppercase">📝 Ghi chú/Khác: ${flightNotes.join(", ")}</div>`;
+                html += `<div class="mb-2 p-2 bg-amber-950/60 rounded border border-amber-500/30 text-[10px] font-bold text-amber-300 uppercase">📝 Ghi chú/Khác: ${flightNotes.join(", ")}</div>`;
             }
 
             html += `<table class="staff-sub-table w-full">`;
             colleagues.forEach(col => { 
-                html += `<tr class="${col.nameNormalized===qNorm?'bg-rose-50':''}"><td>${col.nameOnly}</td><td>${col.task}</td><td class="text-right font-mono font-bold">${getShiftForEmployee(col.nameNormalized, day)}</td></tr>`; 
+                html += `<tr class="${col.nameNormalized===qNorm?'bg-orange-950/50 text-orange-200':''}"><td>${col.nameOnly}</td><td>${col.task}</td><td class="text-right font-mono font-bold">${getShiftForEmployee(col.nameNormalized, day)}</td></tr>`; 
             });
             html += `</table></div></div>`;
         });
@@ -767,17 +775,17 @@ function renderFlightResults(nameRaw){
         dc.forEach((cf, idx) => {
             const accordionId = `acc-cargo-${day}-${idx}`;
             html += `
-            <div class="mb-4 last:mb-0 border-b last:border-0 pb-3" id="${accordionId}">
+            <div class="mb-4 last:mb-0 border-b border-slate-800 last:border-0 pb-3" id="${accordionId}">
                 <div class="flex items-center justify-between cursor-pointer" onclick="document.getElementById('${accordionId}').classList.toggle('details-open')">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="bg-orange-600 text-white px-2 py-0.5 rounded text-[11px] font-bold uppercase">${cf.flt || 'CARGO'}</span>
-                        <span class="text-sm font-bold text-slate-700">⏰ ETD: ${cf.etd || '--:--'}</span>
-                        <span class="text-[10px] font-black text-orange-600 uppercase bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">📦 CARGO / CHARTER</span>
+                        <span class="bg-purple-600 text-white px-2 py-0.5 rounded text-[11px] font-bold uppercase">${cf.flt || 'CARGO'}</span>
+                        <span class="text-sm font-bold text-slate-200">⏰ ETD: ${cf.etd || '--:--'}</span>
+                        <span class="text-[10px] font-black text-purple-300 uppercase bg-purple-950/80 px-1.5 py-0.5 rounded border border-purple-500/30">📦 CARGO / CHARTER</span>
                     </div>
-                    <span class="arrow-icon text-slate-400">▼</span>
+                    <span class="arrow-icon text-slate-500">▼</span>
                 </div>
                 <div class="details-content mt-3 overflow-hidden">
-                    <div class="p-2.5 bg-orange-50/40 rounded-lg border border-orange-100 text-xs text-slate-600 space-y-1">
+                    <div class="p-2.5 bg-purple-950/40 rounded-lg border border-purple-500/20 text-xs text-slate-300 space-y-1">
                         <p>📍 <strong>Dest:</strong> ${cf.dest || '---'}</p>
                         <p>⏰ <strong>ETA:</strong> ${cf.eta || '--:--'} | 🏨 <strong>Rời KS:</strong> ${cf.hotelLeave || '--:--'}</p>
                         ${cf.remark ? `<p>📢 <strong>Remark:</strong> ${cf.remark}</p>` : ''}
@@ -798,13 +806,13 @@ c("flight-select-dropdown").onchange = e => {
     const uniqueMatches = []; const seenN = new Set();
     matches.forEach(m => { if(!seenN.has(m.nameOnly)){ uniqueMatches.push(m); seenN.add(m.nameOnly); } });
     const flightNotes = matches[0]?.notes || [];
-    let html = `<div class="p-4 bg-white border-2 border-rose-200 rounded-xl">`;
+    let html = `<div class="p-4 bg-slate-900 border-2 border-orange-500/40 rounded-xl">`;
     if(flightNotes.length > 0) {
-        html += `<div class="mb-3 p-2 bg-amber-50 rounded border border-amber-100 text-[11px] font-black text-amber-700 uppercase italic">📌 Ghi chú chung: ${flightNotes.join(" • ")}</div>`;
+        html += `<div class="mb-3 p-2 bg-amber-950/60 rounded border border-amber-500/30 text-[11px] font-black text-amber-300 uppercase italic">📌 Ghi chú chung: ${flightNotes.join(" • ")}</div>`;
     }
     html += `<table class="w-full staff-sub-table">`;
     uniqueMatches.forEach(m => { 
-        html += `<tr><td class="font-bold text-sm">${m.nameOnly}</td><td class="text-rose-600 font-bold text-sm">${m.task}</td><td class="text-right font-mono text-sm font-bold">${getShiftForEmployee(m.nameNormalized, sheet)}</td></tr>`; 
+        html += `<tr><td class="font-bold text-sm text-slate-200">${m.nameOnly}</td><td class="text-orange-400 font-bold text-sm">${m.task}</td><td class="text-right font-mono text-sm font-bold text-slate-300">${getShiftForEmployee(m.nameNormalized, sheet)}</td></tr>`; 
     });
     c("flight-detail-info").innerHTML = html + "</table></div>";
 };
@@ -814,7 +822,7 @@ c("search-name").oninput = e => {
     if(!q){ box.classList.add("hidden"); return; }
     const uniqueNames = [...new Set(flightData.map(f=>f.nameOnly))].filter(n=>normalizeText(n).includes(q)).slice(0,10);
     if(!uniqueNames.length){ box.classList.add("hidden"); return; }
-    box.innerHTML = uniqueNames.map(n=>`<div class="px-4 py-3 hover:bg-rose-50 cursor-pointer font-bold text-slate-700 text-sm">${n}</div>`).join("");
+    box.innerHTML = uniqueNames.map(n=>`<div class="px-4 py-3 hover:bg-orange-950/50 cursor-pointer font-bold text-orange-200 text-sm border-b border-slate-800 last:border-0">${n}</div>`).join("");
     box.classList.remove("hidden");
     box.querySelectorAll("div").forEach(div=> div.onclick=()=>{ c("search-name").value=div.textContent; box.classList.add("hidden"); renderFlightResults(div.textContent); });
 };
@@ -842,13 +850,13 @@ c("calc-week").onclick = () => {
         
         validShifts.forEach((item, idx) => {
             const isGayCa = validShifts.length > 1;
-            const rowBg = isGayCa ? "row-ca-gay" : (i % 2 === 0 ? "bg-white" : "bg-slate-50");
+            const rowBg = isGayCa ? "row-ca-gay" : (i % 2 === 0 ? "bg-slate-900/60" : "bg-slate-950/60");
             
-            tbody.innerHTML+=`<tr class="${rowBg} hover:bg-rose-50/50"><td class="font-bold py-3 px-4">${idx === 0 ? d : ""}</td><td><span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[11px] font-bold">${item.p}</span></td><td class='text-center font-mono text-sm'>${fmtHoursToHHMM(item.r.start)}</td><td class='text-center font-mono text-sm'>${fmtHoursToHHMM(item.r.end)}</td><td class='text-center font-bold text-rose-600 text-sm'>${item.r.dur.toFixed(1)}h</td></tr>`;
+            tbody.innerHTML+=`<tr class="${rowBg} hover:bg-orange-950/40"><td class="font-bold py-3 px-4 text-slate-200">${idx === 0 ? d : ""}</td><td><span class="bg-orange-950/80 text-orange-300 border border-orange-500/30 px-2 py-0.5 rounded text-[11px] font-bold">${item.p}</span></td><td class='text-center font-mono text-sm text-slate-300'>${fmtHoursToHHMM(item.r.start)}</td><td class='text-center font-mono text-sm text-slate-300'>${fmtHoursToHHMM(item.r.end)}</td><td class='text-center font-bold text-orange-400 text-sm'>${item.r.dur.toFixed(1)}h</td></tr>`;
             total+=item.r.dur;
         });
     });
-    tbody.innerHTML+=`<tr class='bg-slate-800 text-white font-bold'><td colspan=4 class="py-3 px-4 text-xs uppercase">Tổng tuần</td><td class='text-center text-base py-3'>${total.toFixed(1)}h</td></tr>`;
+    tbody.innerHTML+=`<tr class='bg-slate-950 text-orange-300 font-bold border-t border-orange-500/30'><td colspan=4 class="py-3 px-4 text-xs uppercase">Tổng tuần</td><td class='text-center text-base py-3 text-orange-400'>${total.toFixed(1)}h</td></tr>`;
     if(gayCount >= 4) c("gay-doi-nguoi").classList.remove("hidden"); else c("gay-doi-nguoi").classList.add("hidden");
     c("result-container").classList.remove("hidden"); c("result-container").scrollIntoView({ behavior: 'smooth' });
 };
@@ -860,7 +868,7 @@ c("btn-export-image").onclick = () => {
     const target = c("result-container");
     const btn = c("btn-export-image");
     btn.style.display = "none";
-    html2canvas(target, { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+    html2canvas(target, { scale: 2, backgroundColor: "#0f172a" }).then(canvas => {
         const link = document.createElement('a');
         link.download = `Lich_Ca_Nhan_${c("employee-select").value || "HGS"}.png`;
         link.href = canvas.toDataURL("image/png");
@@ -876,7 +884,7 @@ function renderDropdown(type, query) {
     const selectedSet = (type === 'help' ? selectedHelpNames : type === 'golden' ? selectedGoldenNames : selectedCompareNames);
     const filtered = employeeData.filter(e => normalizeText(e.name).includes(qNorm));
     if (filtered.length === 0) {
-        drop.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">Không tìm thấy ai</div>';
+        drop.innerHTML = '<div class="p-4 text-center text-slate-500 text-xs">Không tìm thấy ai</div>';
         return;
     }
     drop.innerHTML = filtered.map(e => `
@@ -929,8 +937,8 @@ c("btn-find-help").onclick = () => {
                 } 
             });
         }
-        if(!isBusy) html += `<li class="bg-emerald-50 text-emerald-800 p-2.5 rounded border border-emerald-100 flex justify-between"><span>🟢 ${e.name}</span> <span class="text-[10px] font-bold">RẢNH</span></li>`;
-        else html += `<li class="bg-rose-50 text-rose-800 p-2.5 rounded border border-rose-100 flex justify-between"><span>🔴 ${e.name}</span> <span class="text-[10px] font-bold">BẬN: ${busyShift}</span></li>`;
+        if(!isBusy) html += `<li class="bg-emerald-950/60 text-emerald-300 p-2.5 rounded border border-emerald-500/30 flex justify-between"><span>🟢 ${e.name}</span> <span class="text-[10px] font-bold text-emerald-400">RẢNH</span></li>`;
+        else html += `<li class="bg-red-950/60 text-red-300 p-2.5 rounded border border-red-500/30 flex justify-between"><span>🔴 ${e.name}</span> <span class="text-[10px] font-bold text-red-400">BẬN: ${busyShift}</span></li>`;
     });
     c('help-list').innerHTML = html;
     c('help-result').classList.remove("hidden");
@@ -999,15 +1007,15 @@ c("btn-find-best-weekly").onclick = () => {
     });
     const resDiv = c("best-weekly-result");
     resDiv.classList.remove("hidden");
-    resDiv.innerHTML = `<h4 class="font-bold text-slate-700 text-xs uppercase mb-3 text-center">⭐ Giờ Vàng Rảnh Nhất (${windowSize}h) ⭐</h4>`;
+    resDiv.innerHTML = `<h4 class="font-bold text-orange-400 text-xs uppercase mb-3 text-center">⭐ Giờ Vàng Rảnh Nhất (${windowSize}h) ⭐</h4>`;
     finalWeeklyResults.forEach(res => {
         resDiv.innerHTML += `
-            <div class="p-3 bg-white rounded-xl border border-amber-200 shadow-sm mb-2">
+            <div class="p-3 bg-slate-900/90 rounded-xl border border-amber-500/30 shadow-sm mb-2">
                 <div class="flex justify-between items-center mb-1">
-                    <span class="font-black text-slate-700 text-sm">${res.day}</span>
-                    <span class="bg-amber-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">${res.count}/${selectedGoldenNames.size} rảnh</span>
+                    <span class="font-black text-amber-300 text-sm">${res.day}</span>
+                    <span class="bg-amber-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">${res.count}/${selectedGoldenNames.size} rảnh</span>
                 </div>
-                <div class="text-base font-extrabold text-amber-600">⏰ ${fmtHoursToHHMM(res.start)} - ${fmtHoursToHHMM(res.end)}</div>
+                <div class="text-base font-extrabold text-amber-400">⏰ ${fmtHoursToHHMM(res.start)} - ${fmtHoursToHHMM(res.end)}</div>
                 <div class="text-[10px] text-slate-400 mt-1 italic leading-tight">${res.names.join(", ")}</div>
             </div>`;
     });
@@ -1019,7 +1027,7 @@ function renderCargoTab(dayKey = "MON") {
     const filterBox = c("cargo-day-filters");
     
     filterBox.innerHTML = daysOrder.map((d, idx) => {
-        const isActive = d === dayKey ? 'bg-orange-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200';
+        const isActive = d === dayKey ? 'bg-purple-600 text-white shadow-sm' : 'bg-slate-900 text-slate-400 hover:bg-slate-800';
         return `<button onclick="renderCargoTab('${d}')" class="px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${isActive}">${days[idx].replace("Thứ ", "T")}</button>`;
     }).join("");
 
@@ -1027,41 +1035,41 @@ function renderCargoTab(dayKey = "MON") {
     const dayFlights = cargoData.filter(f => f.sheet === dayKey);
 
     if (dayFlights.length === 0) {
-        container.innerHTML = `<p class="text-slate-400 italic text-center py-6 text-sm">Không có dữ liệu Care Cargo / Charter cho ngày này.</p>`;
+        container.innerHTML = `<p class="text-slate-500 italic text-center py-6 text-sm">Không có dữ liệu Care Cargo / Charter cho ngày này.</p>`;
         return;
     }
 
     let html = "";
     dayFlights.forEach(f => {
         html += `
-        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm space-y-3">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+        <div class="p-4 bg-slate-900/80 border border-purple-500/30 rounded-xl shadow-sm space-y-3">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                 <div class="flex items-center gap-2">
-                    <span class="bg-orange-600 text-white px-2.5 py-0.5 rounded text-xs font-black uppercase tracking-wider">${f.flt || 'N/A'}</span>
-                    <span class="text-xs font-bold text-slate-500">📍 Dest: ${f.dest || '---'}</span>
+                    <span class="bg-purple-600 text-white px-2.5 py-0.5 rounded text-xs font-black uppercase tracking-wider">${f.flt || 'N/A'}</span>
+                    <span class="text-xs font-bold text-slate-400">📍 Dest: ${f.dest || '---'}</span>
                 </div>
-                <div class="text-[11px] font-black text-orange-800 bg-orange-100/60 px-2 py-0.5 rounded-md border border-orange-200">
+                <div class="text-[11px] font-black text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded-md border border-purple-500/30">
                     👤 NV: ${f.staff || 'Chưa xếp'}
                 </div>
             </div>
             
             <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight">Giờ ETA</p>
-                    <p class="font-mono font-bold text-slate-700 text-sm mt-0.5">${f.eta || '--:--'}</p>
+                <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800">
+                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tight">Giờ ETA</p>
+                    <p class="font-mono font-bold text-slate-300 text-sm mt-0.5">${f.eta || '--:--'}</p>
                 </div>
-                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight">Giờ ETD</p>
-                    <p class="font-mono font-bold text-slate-700 text-sm mt-0.5">${f.etd || '--:--'}</p>
+                <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800">
+                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tight">Giờ ETD</p>
+                    <p class="font-mono font-bold text-slate-300 text-sm mt-0.5">${f.etd || '--:--'}</p>
                 </div>
-                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight">Rời Khách Sạn</p>
-                    <p class="font-mono font-bold text-rose-600 text-sm mt-0.5">${f.hotelLeave || '--:--'}</p>
+                <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800">
+                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tight">Rời Khách Sạn</p>
+                    <p class="font-mono font-bold text-orange-400 text-sm mt-0.5">${f.hotelLeave || '--:--'}</p>
                 </div>
             </div>
             
             ${f.remark ? `
-            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 text-xs text-slate-600 leading-relaxed font-medium">
+            <div class="p-2.5 bg-slate-950/80 rounded-lg border border-slate-800 text-xs text-slate-300 leading-relaxed font-medium">
                 📢 <strong>Remark:</strong> ${f.remark}
             </div>` : ''}
         </div>`;
@@ -1069,15 +1077,14 @@ function renderCargoTab(dayKey = "MON") {
     container.innerHTML = html;
 }
 
-// --- HÀM XỬ LÝ HIỂN THỊ TAB SO SÁNH (ĐÃ CẬP NHẬT CẢ TUẦN) ---
 function renderCompareTab(dayKey = "all") {
     currentCompareDay = dayKey;
     const filterBox = c("compare-day-filters");
     
-    let buttonsHTML = `<button onclick="renderCompareTab('all')" class="px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${dayKey === 'all' ? 'bg-cyan-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Cả Tuần</button>`;
+    let buttonsHTML = `<button onclick="renderCompareTab('all')" class="px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${dayKey === 'all' ? 'bg-cyan-600 text-white shadow-sm' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}">Cả Tuần</button>`;
 
     buttonsHTML += Object.keys(dayMap).map((d, idx) => {
-        const isActive = d === dayKey ? 'bg-cyan-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200';
+        const isActive = d === dayKey ? 'bg-cyan-600 text-white shadow-sm' : 'bg-slate-900 text-slate-400 hover:bg-slate-800';
         return `<button onclick="renderCompareTab('${d}')" class="px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${isActive}">${days[idx].replace("Thứ ", "T")}</button>`;
     }).join("");
     
@@ -1088,7 +1095,7 @@ function renderCompareTab(dayKey = "all") {
 function drawCompareChart() {
     const container = c("compare-chart-container");
     if (selectedCompareNames.size === 0) {
-        container.innerHTML = `<p class="text-slate-400 italic text-center py-6 text-sm">Vui lòng tìm và chọn nhân viên ở trên để vẽ biểu đồ so sánh.</p>`;
+        container.innerHTML = `<p class="text-slate-500 italic text-center py-6 text-sm">Vui lòng tìm và chọn nhân viên ở trên để vẽ biểu đồ so sánh.</p>`;
         return;
     }
 
@@ -1099,13 +1106,13 @@ function drawCompareChart() {
         const dayName = days[Object.keys(dayMap).indexOf(dKey)];
 
         if(currentCompareDay === 'all') {
-            html += `<div class="font-bold text-cyan-700 text-sm mt-4 mb-2 border-b border-cyan-100 pb-1">📅 ${dayName}</div>`;
+            html += `<div class="font-bold text-cyan-400 text-sm mt-4 mb-2 border-b border-cyan-500/20 pb-1">📅 ${dayName}</div>`;
         }
 
         html += `
         <div style="position: relative; padding-top: 25px; min-width: 500px; overflow-x: auto; margin-bottom: 15px;">
             <!-- Lưới thời gian chung (24h) -->
-            <div style="position: absolute; top: 25px; left: 90px; right: 0; bottom: 0; pointer-events: none; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; z-index: 0;">
+            <div style="position: absolute; top: 25px; left: 90px; right: 0; bottom: 0; pointer-events: none; border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1); z-index: 0;">
                 ${[0, 4, 8, 12, 16, 20, 24].map(h => `<div class="timeline-line" style="left: ${(h/24)*100}%; z-index: 0;"><div class="timeline-label">${h}h</div></div>`).join('')}
             </div>
         `;
