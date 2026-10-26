@@ -616,7 +616,7 @@ function processAndUpload(data){
     if(!sn) return;
     const sheet = wb.Sheets[sn];
     
-    for(let r=49; r<=63; r++) {
+    for(let r=59; r<=74; r++) {
         const fVal = sheet['M'+r] ? String(sheet['M'+r].v).trim() : null;
         if(fVal || (sheet['R'+r] && sheet['R'+r].v)) {
             const flt = fVal || "";
@@ -646,7 +646,7 @@ function processAndUpload(data){
     }
 
     let lastFlt="", lastEtd="", lastGate="";
-    for(let r=4; r<=46; r++){
+    for(let r=4; r<=57; r++){
       const fVal=sheet['M'+r]?sheet['M'+r].v:null, eVal=sheet['N'+r]?sheet['N'+r].v:null, gVal=sheet['Q'+r]?sheet['Q'+r].v:null;
       const flt=fVal?String(fVal).trim():lastFlt, etd=eVal!==null?excelTimeToHHMM(eVal):lastEtd, gate=gVal?String(gVal).trim():lastGate;
       if(!flt) continue; lastFlt=flt; lastEtd=etd; lastGate=gate;
