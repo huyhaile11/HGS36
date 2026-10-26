@@ -645,6 +645,36 @@ function processAndUpload(data){
         }
     }
 
+    // 🔍 TỰ ĐỘNG NHẬN DIỆN CỘT TỪ HÀNG 3 (Row 3 trong Excel: index row r = 2 trong code)
+    const taskColMap = {}; // Lưu trữ: colIndex -> 'SUP' | 'GATE' | 'K.SỔ' | 'WLC'
+    for(let cIdx=0; cIdx<=50; cIdx++) {
+        const cell = sheet[XLSX.utils.encode_col(cIdx) + '3'];
+        if(cell && cell.v) {
+            const headerText = normalizeText(String(cell.v));
+            if(headerText.includes('SUP')) {
+                taskColMap[cIdx] = 'SUP';
+            } else if(headerText.includes('GATE')) {
+                taskColMap[cIdx] = 'GATE';
+            } else if(headerText.includes('KSO') || headerText.includes('KET SO') || headerText.includes('KS')) {
+                taskColMap[cIdx] = 'K.SỔ';
+            } else if(headerText.includes('WLC')) {
+                taskColMap[cIdx] = 'WLC';
+            }
+        }
+    }
+
+    // Trường hợp dự phòng nếu hàng 3 không có chữ (dùng mặc định các cột 15, 16, 17, 18)
+    if(Object.keys(taskColMap).length === 0) {
+        taskColMap[15] = 'SUP';
+        taskColMap[16] = 'GATE';
+        taskColMap[17] = 'K.SỔ';
+        taskColMap[18] = 'WLC';
+    }
+
+    const taskColIndices = Object.keys(taskColMap).map(Number);
+    const minTaskCol = Math.min(...taskColIndices);
+    const maxTaskCol = Math.max(...taskColIndices);
+
     let lastFlt="", lastEtd="", lastGate="";
     for(let r=4; r<=57; r++){
       const fVal=sheet['M'+r]?sheet['M'+r].v:null, eVal=sheet['N'+r]?sheet['N'+r].v:null, gVal=sheet['Q'+r]?sheet['Q'+r].v:null;
@@ -652,7 +682,7 @@ function processAndUpload(data){
       if(!flt) continue; lastFlt=flt; lastEtd=etd; lastGate=gate;
       
       let rowNotes = []; 
-      for(let colIdx=15; colIdx<=31; colIdx++){
+      for(let colIdx = minTaskCol; colIdx <= maxTaskCol + 15; colIdx++){
         const cell = sheet[XLSX.utils.encode_col(colIdx)+r];
         if(cell && cell.v){
             const cellVal = String(cell.v).trim();
@@ -665,7 +695,7 @@ function processAndUpload(data){
                         sheet: dName, flt, etd, gate, 
                         nameOnly: nOriginal,
                         nameNormalized: normalizeText(nBase),
-                        task: (colIdx===15?'SUP':colIdx===16?'GATE':colIdx===17?'K.SỔ':colIdx===18?'WLC':''),
+                        task: taskColMap[colIdx] || '',
                         row: r 
                     });
                 });
